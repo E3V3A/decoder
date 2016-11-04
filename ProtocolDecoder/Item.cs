@@ -274,7 +274,7 @@ namespace ProtocolDecoder
                     if (buildId != BuildID)
                     {
                         BuildID = buildId;
-                        Writer.WriteLine(String.Format("                     Build ID: {0}", buildId));
+                        Writer.WriteLine(String.Format("{0},        Build ID: {1}", TimeStamp, buildId));
                     }
                 }
             }
@@ -307,7 +307,7 @@ namespace ProtocolDecoder
                 }
                 if (IMEI != imei || IMSI != imsi)
                 {
-                    Writer.WriteLine(String.Format("                     IMEI: {0}, IMSI: {1}", imei, imsi));
+                    Writer.WriteLine(String.Format("{0},        IMEI: {1}, IMSI: {2}", TimeStamp, imei, imsi));
                     IMEI = imei;
                     IMSI = imsi;
                 }

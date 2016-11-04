@@ -18,6 +18,7 @@ namespace ProtocolDecoder
         private bool NeedSummary = false;
         private string IMEI = null;
         private string IMSI = null;
+        private string BuildID = null;
 
         public Item(StreamWriter writer, bool hasSummary)
         {
@@ -263,12 +264,18 @@ namespace ProtocolDecoder
             Match match = null;
             if (Name.Contains("Extended Build ID"))
             {
+                string buildId = null;
                 index += 3;
                 match = Regex.Match(Content[index], @"Build ID and Model = (.*)");
                 index++;
-                if (match.Success&& match.Groups[1].Value!="")
+                if (match.Success && match.Groups[1].Value != "")
                 {
-                    Writer.WriteLine(String.Format("                     Build ID: {0}", match.Groups[1].Value));
+                    buildId = match.Groups[1].Value;
+                    if (buildId != BuildID)
+                    {
+                        BuildID = buildId;
+                        Writer.WriteLine(String.Format("                     Build ID: {0}", buildId));
+                    }
                 }
             }
             else if (Name.Contains("GSM Status Response") || Name.Contains("WCDMA Additional Status Response"))
@@ -298,8 +305,8 @@ namespace ProtocolDecoder
                         imsi = match.Groups[1].Value;
                     }
                 }
-                if(IMEI != imei || IMSI != imsi)
-                { 
+                if (IMEI != imei || IMSI != imsi)
+                {
                     Writer.WriteLine(String.Format("                     IMEI: {0}, IMSI: {1}", imei, imsi));
                     IMEI = imei;
                     IMSI = imsi;

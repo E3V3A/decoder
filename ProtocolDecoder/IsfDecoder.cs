@@ -67,7 +67,7 @@ namespace ProtocolDecoder
             bw.ReportProgress(1, "extracting apdu isf log");
             string apduIsf = basePathName + "_apdu.isf";
 
-            Mask mask = new Mask(apduIsf);
+            LogMask mask = new LogMask(apduIsf);
             mask.LogList = new uint[] { 0x1098, 0x14ce };
             mask.DiagList = new uint[] { 124 };
             mask.SubSysList = new SubSysMask[] { new SubSysMask(8,1), new SubSysMask(4,15)};
@@ -80,10 +80,10 @@ namespace ProtocolDecoder
 
             if (needOTA)
             {
-                QXDMProcessor.GetIsfAsync(new Mask(basePathName + "_qmi.isf",
+                QXDMProcessor.GetIsfAsync(new LogMask(basePathName + "_qmi.isf",
                     new uint[] { 0x138e, 0x138f, 0x1390, 0x1391, 0x1544 }));
 
-                QXDMProcessor.GetIsfAsync(new Mask(basePathName + "_ota.isf",
+                QXDMProcessor.GetIsfAsync(new LogMask(basePathName + "_ota.isf",
                     new uint[] 
                 { 0xb0c0, 0xb0e2, 0xb0e3, 0xb0ec, 0xb0ed, //LTE
                   0x713a, 0x7b3a, 0xd0e3, 0x412f, // UMTS, TDS, W
@@ -110,6 +110,7 @@ namespace ProtocolDecoder
             }
 
             IsfAnalyzer.Stop();
+            File.Delete(apduIsf);
 
             string decodedText = basePathName + "_apdu_raw.txt";
             totalCount = GetApduFromText(targetText, decodedText, needSummary);
@@ -118,7 +119,7 @@ namespace ProtocolDecoder
             string extra = null;
             if (QXDMProcessor.IsBusy())
             {
-                extra = ", still extracting qmi and ota log";
+                extra = ", still extracting qmi and ota log, do not close";
             }
 
             bw.ReportProgress(1, message + extra);

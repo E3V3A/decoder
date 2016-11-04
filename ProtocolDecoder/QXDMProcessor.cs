@@ -12,7 +12,7 @@ namespace ProtocolDecoder
     interface IQXDMProcessor
     {
         bool Start(string file);
-        bool GetIsf(Mask mask);
+        bool GetIsf(LogMask mask);
         void Stop();
     }
 
@@ -20,11 +20,11 @@ namespace ProtocolDecoder
     {
         private static IQXDMProcessor qxdm = null;
         private static Thread workThread = null;
-        private static Queue<Mask> maskQueue = null;
+        private static Queue<LogMask> maskQueue = null;
         public static bool Start(string sourceFile)
         {
             workThread = new Thread(GetIsfVoid);
-            maskQueue = new Queue<Mask>();
+            maskQueue = new Queue<LogMask>();
 
             bool qxdm3Present = (Registry.ClassesRoot.OpenSubKey("QXDM.Application") != null);
             bool qxdm4Present = (Registry.ClassesRoot.OpenSubKey("QXDM.QXDMAutoApplication") != null);
@@ -49,7 +49,7 @@ namespace ProtocolDecoder
             qxdm = null;
             return false;
         }
-        public static bool GetIsf(Mask mask)
+        public static bool GetIsf(LogMask mask)
         {
             if (qxdm != null)
             {
@@ -69,7 +69,7 @@ namespace ProtocolDecoder
         }
 
 
-        public static void GetIsfAsync(Mask mask)
+        public static void GetIsfAsync(LogMask mask)
         {
             lock (maskQueue)
             {

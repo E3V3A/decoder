@@ -60,7 +60,7 @@ namespace ProtocolDecoder
             return true;
         }
 
-        public bool GetIsf(Mask mask)
+        public bool GetIsf(LogMask mask)
         {
             ApplyFilter(mask);
 
@@ -76,7 +76,7 @@ namespace ProtocolDecoder
             iIsf.CloseItemStore(isfHandler);
         }
 
-        private void ApplyFilter(Mask mask)
+        private void ApplyFilter(LogMask mask)
         {
             iConfig.ClearConfig();
             if (mask.LogList != null && mask.LogList.Length > 0)

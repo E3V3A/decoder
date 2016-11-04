@@ -64,7 +64,7 @@ namespace ProtocolDecoder
             return true;
         }
 
-        public bool GetIsf(Mask mask)
+        public bool GetIsf(LogMask mask)
         {
             ApplyFilter(mask);
 
@@ -82,7 +82,7 @@ namespace ProtocolDecoder
             qxdmWindow.CloseItemStore();
         }
 
-        private void ApplyFilter(Mask mask)
+        private void ApplyFilter(LogMask mask)
         {
             if (mask.MsgList != null && mask.MsgList.Length > 0)
             {

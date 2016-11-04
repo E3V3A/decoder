@@ -940,7 +940,7 @@ namespace ProtocolDecoder
         }
         static void DateTimeAndTimezoneHandler(byte[] bytes)
         {
-            SMS.DecodeTime7Byte(bytes);
+            SMSDecoder.DecodeTime7Byte(bytes);
         }
         static void LanguageHandler(byte[] bytes)
         {
@@ -1003,7 +1003,7 @@ namespace ProtocolDecoder
                 HandleLengthError(bytes);
                 return;
             }
-            SMS.DecodeTime3Byte(bytes);
+            SMSDecoder.DecodeTime3Byte(bytes);
         }
 
 

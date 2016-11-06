@@ -13,6 +13,9 @@ namespace ProtocolDecoder
 {
     class Utils
     {
+        public static string BaseFileName = null;
+        public static string ExtractedFileName = null;
+        public static string ExtractedTextName = null;
         public static byte[] ConvertInputToByteArray(string input)
         {
 
@@ -31,21 +34,20 @@ namespace ProtocolDecoder
             return bytes;
         }
 
-        public static string GetFullBaseFileName(string fileName)
+        public static void InitBaseFileName(string fileName)
         {
-            string fullName = null;
             try
             {
-                fullName = Path.Combine(Path.GetDirectoryName(fileName), Path.GetFileNameWithoutExtension(fileName));
+                BaseFileName = Path.Combine(Path.GetDirectoryName(fileName), Path.GetFileNameWithoutExtension(fileName));
+                ExtractedFileName = BaseFileName + "_extracted.isf";
+                ExtractedTextName = BaseFileName + "_extracted.txt";
             }
             catch (Exception e)
             {
-                Debug.WriteLine(e.ToString());
+                BaseFileName = @"c:\ProtocolDecoder\log";
             }
-            return fullName;
-
         }
-
+        
         public static bool IsValidIsf(string file)
         {
             if (!File.Exists(file) || (Path.GetExtension(file) != ".isf" && Path.GetExtension(file) != ".qmdl"))

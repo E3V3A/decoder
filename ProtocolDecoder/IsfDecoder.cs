@@ -14,15 +14,14 @@ namespace ProtocolDecoder
 {
     class IsfDecoder
     {
-        private static long GetApduFromText(string source, string target, bool hasSummary)
+        private static long DecodeText(string source, bool hasSummary)
         {
             string line = null;
             Match match = null;
             long totalCount = 0;
             StreamReader reader = new StreamReader(source);
-            StreamWriter writer = new StreamWriter(target);
 
-            Item item = new Item(writer, hasSummary);
+            Item item = new Item(hasSummary);
             while ((line = reader.ReadLine()) != null)
             {
                 match = Regex.Match(line, @"^\d{4} .{6}  (..:..:..\....)  .{4}  0x(....)  (.*)");
@@ -38,16 +37,16 @@ namespace ProtocolDecoder
                 }
             }
             item.Process();
+            item.Close();
             totalCount++;
 
             reader.Close();
-            writer.Close();
             return totalCount;
         }
 
-        public static void ExtractApdu(string sourceIsf, BackgroundWorker bw, bool usePCTime, bool needSummary, bool needOTA)
+        public static void DecodeIsf(string sourceIsf, BackgroundWorker bw, bool usePCTime, bool needSummary, bool needOTA, bool needMsg)
         {
-            string basePathName = Utils.GetFullBaseFileName(sourceIsf);
+            Utils.InitBaseFileName(sourceIsf);
             //FileInfo fileInfo = new FileInfo(isfFile);
             long totalCount = 0;
 
@@ -64,27 +63,30 @@ namespace ProtocolDecoder
                 return;
             }
 
-            bw.ReportProgress(1, "extracting apdu isf log");
-            string apduIsf = basePathName + "_apdu.isf";
+            bw.ReportProgress(1, "extracting isf log");
 
-            LogMask mask = new LogMask(apduIsf);
+            LogMask mask = new LogMask(Utils.ExtractedFileName);
             mask.LogList = new uint[] { 0x1098, 0x14ce };
+            if (needMsg)
+            {
+                mask.MsgList = new uint[] { 21 };
+            }
             mask.DiagList = new uint[] { 124 };
-            mask.SubSysList = new SubSysMask[] { new SubSysMask(8,1), new SubSysMask(4,15)};
+            mask.SubSysList = new SubSysMask[] { new SubSysMask(8, 1), new SubSysMask(4, 15) };
             if (!QXDMProcessor.GetIsf(mask))
             {
                 QXDMProcessor.Stop();
-                bw.ReportProgress(0, "no valid apdu present.");
+                bw.ReportProgress(0, "no valid log present.");
                 return;
             }
 
             if (needOTA)
             {
-                QXDMProcessor.GetIsfAsync(new LogMask(basePathName + "_qmi.isf",
+                QXDMProcessor.GetIsfAsync(new LogMask(Utils.BaseFileName + "_qmi.isf",
                     new uint[] { 0x138e, 0x138f, 0x1390, 0x1391, 0x1544 }));
 
-                QXDMProcessor.GetIsfAsync(new LogMask(basePathName + "_ota.isf",
-                    new uint[] 
+                QXDMProcessor.GetIsfAsync(new LogMask(Utils.BaseFileName + "_ota.isf",
+                    new uint[]
                 { 0xb0c0, 0xb0e2, 0xb0e3, 0xb0ec, 0xb0ed, //LTE
                   0x713a, 0x7b3a, 0xd0e3, 0x412f, // UMTS, TDS, W
                   0x1004, 0x1005, 0x1006, 0x1007, 0x1008, //1X
@@ -92,7 +94,6 @@ namespace ProtocolDecoder
             }
 
             bw.ReportProgress(1, "opening apex/qcat");
-            string targetText = basePathName + "_apdu.txt";
             if (!IsfAnalyzer.Start(usePCTime))
             {
                 bw.ReportProgress(0, "need to install apex or qcat");
@@ -101,20 +102,20 @@ namespace ProtocolDecoder
             }
 
             bw.ReportProgress(1, "saving isf log to text");
-            if (!IsfAnalyzer.ConvetIsf2Text(apduIsf, targetText))
+            if (!IsfAnalyzer.ConvetIsf2Text(Utils.ExtractedFileName, Utils.ExtractedTextName))
             {
-                bw.ReportProgress(0, "no valid log present");
+                bw.ReportProgress(0, "no valid log present in extracted isf");
                 IsfAnalyzer.Stop();
                 QXDMProcessor.Stop();
                 return;
             }
 
             IsfAnalyzer.Stop();
-            File.Delete(apduIsf);
+            File.Delete(Utils.ExtractedFileName);
 
-            string decodedText = basePathName + "_apdu_raw.txt";
-            totalCount = GetApduFromText(targetText, decodedText, needSummary);
-            
+            bw.ReportProgress(1, "decoding text file");
+            totalCount = DecodeText(Utils.ExtractedTextName, needSummary);
+
             string message = "total number of extracted apdu is " + totalCount;
             string extra = null;
             if (QXDMProcessor.IsBusy())

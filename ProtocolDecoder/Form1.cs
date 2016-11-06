@@ -130,8 +130,7 @@ namespace ProtocolDecoder
         private void backgroundWorker1_DoWork(object sender, DoWorkEventArgs e)
         {
             string path = e.Argument.ToString();
-            IsfDecoder.ExtractApdu(path, (BackgroundWorker)sender, checkBoxTime.Checked, checkBoxSummary.Checked, checkBoxOTA.Checked);
-
+            IsfDecoder.DecodeIsf(path, (BackgroundWorker)sender, checkBoxTime.Checked, checkBoxSummary.Checked, checkBoxOTA.Checked, checkBoxMsg.Checked);
         }
 
         private void backgroundWorker1_ProgressChanged(object sender, ProgressChangedEventArgs e)

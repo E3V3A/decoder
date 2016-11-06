@@ -14,16 +14,26 @@ namespace ProtocolDecoder
         private int Code = 0;
         private string Name = null;
         private List<string> Content = new List<string>();
-        private StreamWriter Writer = null;
+        private StreamWriter ApduFileWriter = null;
+        private StreamWriter MsgFileWriter = null;
+        private StreamWriter CardFileWriter = null;
+        private StreamWriter StkFileWriter = null;
         private bool NeedSummary = false;
         private string IMEI = null;
         private string IMSI = null;
         private string BuildID = null;
 
-        public Item(StreamWriter writer, bool hasSummary)
+        public Item( bool hasSummary)
         {
-            Writer = writer;
             NeedSummary = hasSummary;
+        }
+
+        public void Close()
+        {
+            if (ApduFileWriter != null) ApduFileWriter.Close();
+            if ( MsgFileWriter!=null) MsgFileWriter.Close();
+            if (CardFileWriter != null) CardFileWriter.Close();
+            if (StkFileWriter != null) StkFileWriter.Close();
         }
 
         public bool IsValidItem()
@@ -170,6 +180,15 @@ namespace ProtocolDecoder
                 return ", " + part1 + ", " + part2;
             }
         }
+        
+        private void WriteApduFile(string line)
+        {
+            if(ApduFileWriter == null)
+            {
+                ApduFileWriter = new StreamWriter(Utils.BaseFileName + "_uim_apdu.txt");
+            }
+            ApduFileWriter.WriteLine(line);
+        }
 
         //传入的数据以"APDU Parsing"开头
         private void ProcessParsedAPDU(List<string> text)
@@ -198,7 +217,7 @@ namespace ProtocolDecoder
             {
                 output.Append(handler(text, index));
             }
-            Writer.WriteLine(output.ToString());
+            WriteApduFile(output.ToString());
         }
 
         private void Handle1098()
@@ -211,7 +230,7 @@ namespace ProtocolDecoder
                 match = Regex.Match(Content[index], @"\t{4}([TR]X) {10}(.*)");
                 if (match.Success)
                 {
-                    Writer.WriteLine(String.Format("{0}, SLOT{1}, {2}: {3}", TimeStamp, 0, match.Groups[1].Value, match.Groups[2].Value));
+                    WriteApduFile(String.Format("{0}, SLOT{1}, {2}: {3}", TimeStamp, 0, match.Groups[1].Value, match.Groups[2].Value));
                     continue;
                 }
 
@@ -249,12 +268,44 @@ namespace ProtocolDecoder
                     break;
                 }
             }
-
-            Writer.WriteLine(String.Format("{0}, SLOT{1}, {2}: {3}", TimeStamp, slot, direction, apdu.ToString()));
+            WriteApduFile(String.Format("{0}, SLOT{1}, {2}: {3}", TimeStamp, slot, direction, apdu.ToString()));
 
             if (found)
             {
                 ProcessParsedAPDU(Content.Skip(index).ToList());
+            }
+        }
+
+        private void HandleDebugMsg()
+        {
+            if(Content.Count == 0)
+            {
+                return;
+            }
+            Match match = Regex.Match(Content[0], @"\t(\S*)\t(\d*)\t(\w)\t(.*)");
+            if(!match.Success)
+            {
+                return;
+            }
+            string output = String.Format("{0} {1,20} {2,5} {3} {4}", TimeStamp, match.Groups[1].Value, match.Groups[2].Value, match.Groups[3].Value, match.Groups[4].Value);
+
+            if (MsgFileWriter == null) MsgFileWriter = new StreamWriter(Utils.BaseFileName + "_msg.txt");
+            MsgFileWriter.WriteLine(output);
+            
+            string cardFilter = @"gstk_init\s|Debounce logic ended successfully|Delay the powerup by|uim power up @|uim power down @|atr byte\[0|No. of Apps present|DF Present|Received MMGSDI_NOTIFY_LINK_EST_REQ|NV_UIM_SELECT_DEFAULT_USIM_APP_I Read|Handling cmd:0x26|Handling cmd:0x29|Handling cmd:0x30|Handling cmd:0x38|mmgsdi_util_select_first_app|Timed out on the command response|MMGSDI_FEATURE_MULTISIM_AUTO_PROVISIONING|Auto provisioning from MMGSDI EFS for App_type =|MMGSDI_CARD_INSERTED_EVT, slot:|MMGSDI_SESSION_CHANGED_EVT, app:|MMGSDI_PIN1_EVT, status:|MMGSDI_PERSO_EVT,|MMGSDI_SUBSCRIPTION_READY_EVT, app:|mmgsdi_session_manage_illegal_subscription|REMOVED_EVT, condition:";
+            string stkFilter = @"gstk_process_envelope_cmd:|In gstk_process_proactive_command|SENDING REFRESH REQ TO MMGSDI|END Proactive session|Generating CAT EVT REPORT IND for Proactive Cmd|IN GSTK_OPEN_CH_REQ|IN GSTK_PROVIDE_LOCAL_INFO_REQ|IN GSTK_SEND_DATA_REQ:|IN GSTK_MORE_TIME_REQ|IN GSTK_SETUP_MENU_REQ|IN GSTK_SETUP_IDLE_TXT_REQ|IN GSTK_CLOSE_CH_REQ|IN GSTK_SETUP_EVT_LIST_REQ|IN GSTK_RECEIVE_DATA_REQ:|IN GSTK_SEND_SS_REQ|IN GSTK_TIMER_MANAGEMENT_REQ|IN GSTK_polling_REQ|IN GSTK_SEND_ussd_REQ|Received Term rsp|gstk_send_raw_terminal_response|UIM envelope rsp queued to front of GSTK queue";
+            Match filter = null;
+            filter = Regex.Match(match.Groups[4].Value, cardFilter);
+            if(filter.Success)
+            {
+                if(CardFileWriter == null) CardFileWriter = new StreamWriter(Utils.BaseFileName + "_msg_card_init.txt");
+                CardFileWriter.WriteLine(output);
+            }
+            filter = Regex.Match(match.Groups[4].Value, stkFilter);
+            if (filter.Success)
+            {
+                if (StkFileWriter == null) StkFileWriter = new StreamWriter(Utils.BaseFileName + "_msg_stk.txt");
+                StkFileWriter.WriteLine(output);
             }
         }
 
@@ -266,6 +317,10 @@ namespace ProtocolDecoder
             {
                 string buildId = null;
                 index += 3;
+                if(index >= Content.Count)
+                {
+                    return;
+                }
                 match = Regex.Match(Content[index], @"Build ID and Model = (.*)");
                 index++;
                 if (match.Success && match.Groups[1].Value != "")
@@ -274,7 +329,7 @@ namespace ProtocolDecoder
                     if (buildId != BuildID)
                     {
                         BuildID = buildId;
-                        Writer.WriteLine(String.Format("{0},        Build ID: {1}", TimeStamp, buildId));
+                        WriteApduFile(String.Format("{0},        Build ID: {1}", TimeStamp, buildId));
                     }
                 }
             }
@@ -307,7 +362,7 @@ namespace ProtocolDecoder
                 }
                 if (IMEI != imei || IMSI != imsi)
                 {
-                    Writer.WriteLine(String.Format("{0},        IMEI: {1}, IMSI: {2}", TimeStamp, imei, imsi));
+                    WriteApduFile(String.Format("{0},        IMEI: {1}, IMSI: {2}", TimeStamp, imei, imsi));
                     IMEI = imei;
                     IMSI = imsi;
                 }
@@ -329,6 +384,9 @@ namespace ProtocolDecoder
                         break;
                     case 0x1ff0:
                         HandleDiagRsp();
+                        break;
+                    case 0x1feb:
+                        HandleDebugMsg();
                         break;
                 }
             }

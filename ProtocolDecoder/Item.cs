@@ -10,30 +10,33 @@ namespace ProtocolDecoder
 {
     class Item
     {
+        private uint RawIndex = 0;
         private string TimeStamp = null;
         private int Code = 0;
         private string Name = null;
         private List<string> Content = new List<string>();
         private StreamWriter ApduFileWriter = null;
         private StreamWriter MsgFileWriter = null;
-        private StreamWriter CardFileWriter = null;
-        private StreamWriter StkFileWriter = null;
+        private uint ApduCounter = 0;
+        //private StreamWriter CardFileWriter = null;
+        //private StreamWriter StkFileWriter = null;
         private bool NeedSummary = false;
         private string IMEI = null;
         private string IMSI = null;
         private string BuildID = null;
+        private string Slot = "0";
 
-        public Item( bool hasSummary)
+        public Item(bool hasSummary)
         {
             NeedSummary = hasSummary;
         }
 
-        public void Close()
+        public void CloseFile()
         {
             if (ApduFileWriter != null) ApduFileWriter.Close();
-            if ( MsgFileWriter!=null) MsgFileWriter.Close();
-            if (CardFileWriter != null) CardFileWriter.Close();
-            if (StkFileWriter != null) StkFileWriter.Close();
+            if (MsgFileWriter != null) MsgFileWriter.Close();
+            //if (CardFileWriter != null) CardFileWriter.Close();
+            //if (StkFileWriter != null) StkFileWriter.Close();
         }
 
         public bool IsValidItem()
@@ -43,15 +46,17 @@ namespace ProtocolDecoder
         public void Clear()
         {
             TimeStamp = null;
+            Slot = "0";
             Content.Clear();
         }
         public void Add(string line)
         {
             Content.Add(line);
         }
-        public void Init(string time, string code, string name)
+        public void Init(uint index, string time, string code, string name)
         {
             Clear();
+            RawIndex = index;
             TimeStamp = time;
             Code = Convert.ToInt32(code, 16);
             Name = name;
@@ -180,14 +185,36 @@ namespace ProtocolDecoder
                 return ", " + part1 + ", " + part2;
             }
         }
-        
+
+        private void WriteFile(StreamWriter sw, string line)
+        {
+            //sw.WriteLine(String.Format("{0,-7} {1} {2}", RawIndex, TimeStamp, line));
+            StringBuilder sb = new StringBuilder(String.Format("{0,-7} {1} 0x{2:X4} ", RawIndex, TimeStamp, Code));
+            
+            if(Name != null)
+            {
+                sb.Append(Name+" ");
+            }
+
+            sw.WriteLine(sb.Append(line));
+        }
+
         private void WriteApduFile(string line)
         {
-            if(ApduFileWriter == null)
+            if (ApduFileWriter == null)
             {
-                ApduFileWriter = new StreamWriter(Utils.BaseFileName + "_uim_apdu.txt");
+                ApduFileWriter = new StreamWriter(Utils.BaseFileName + "_apdu.txt");
             }
-            ApduFileWriter.WriteLine(line);
+            WriteFile(ApduFileWriter, line);
+        }
+
+        private void WriteDebugFile(string line)
+        {
+            if (MsgFileWriter == null)
+            {
+                MsgFileWriter = new StreamWriter(Utils.BaseFileName + "_msg.txt");
+            }
+            WriteFile(MsgFileWriter, line);
         }
 
         //传入的数据以"APDU Parsing"开头
@@ -212,12 +239,15 @@ namespace ProtocolDecoder
             }
             ParsedApduHandler handler = null;
             ParsedApduHandlerDictionary.TryGetValue(apduType, out handler);
-            StringBuilder output = new StringBuilder("                     Summary: " + apduType);
+            StringBuilder output = new StringBuilder();
             if (handler != null)
             {
-                output.Append(handler(text, index));
+                WriteApduFile(String.Format("SLOT{0} Summary: {1}{2}", Slot, apduType, handler(text, index)));
             }
-            WriteApduFile(output.ToString());
+            else
+            {
+                WriteApduFile(String.Format("SLOT{0} Summary: {1}", Slot, apduType));
+            }
         }
 
         private void Handle1098()
@@ -230,7 +260,7 @@ namespace ProtocolDecoder
                 match = Regex.Match(Content[index], @"\t{4}([TR]X) {10}(.*)");
                 if (match.Success)
                 {
-                    WriteApduFile(String.Format("{0}, SLOT{1}, {2}: {3}", TimeStamp, 0, match.Groups[1].Value, match.Groups[2].Value));
+                    WriteApduFile(String.Format("SLOT{0} {1}: {2}", Slot, match.Groups[1].Value, match.Groups[2].Value));
                     continue;
                 }
 
@@ -244,7 +274,6 @@ namespace ProtocolDecoder
 
         private void Handle14CE()
         {
-            string slot = "0";
             string direction = null;
             StringBuilder apdu = new StringBuilder();
             Match match = null;
@@ -257,7 +286,7 @@ namespace ProtocolDecoder
                 if (match.Success)
                 {
                     direction = match.Groups[1].Value;
-                    slot = match.Groups[2].Value;
+                    Slot = match.Groups[2].Value;
                     apdu.Append(match.Groups[3].Value + " ");
                     continue;
                 }
@@ -268,7 +297,7 @@ namespace ProtocolDecoder
                     break;
                 }
             }
-            WriteApduFile(String.Format("{0}, SLOT{1}, {2}: {3}", TimeStamp, slot, direction, apdu.ToString()));
+            WriteApduFile(String.Format("SLOT{0} {1}: {2}", Slot, direction, apdu.ToString()));
 
             if (found)
             {
@@ -276,37 +305,247 @@ namespace ProtocolDecoder
             }
         }
 
+        private void HandleOTA()
+        {
+            WriteDebugFile("");
+        }
+
+        private void HandleQMI2()
+        {
+            if (Content.Count < 5)
+            {
+                return;
+            }
+            string client = null;
+            string ctlflags = null;
+            string txid = null;
+            string msgtype = null;
+            Match match = null;
+            int index = 0;
+            string extra = null;
+
+            index += 4;
+            match = Regex.Match(Content[index], @"(.*) {");
+            if (match.Success)
+            {
+                //MsgType在括号内的情况
+                if (Content.Count < 9)
+                {
+                    return;
+                }
+
+                index++;
+                match = Regex.Match(Content[index], @"   (.*)");
+                client = match.Groups[1].Value;
+
+                index++;
+                match = Regex.Match(Content[index], @"   (.*)");
+                ctlflags = match.Groups[1].Value;
+
+                index++;
+                match = Regex.Match(Content[index], @"   (.*)");
+                txid = match.Groups[1].Value;
+
+                index++;
+                match = Regex.Match(Content[index], @"   (.*)");
+                msgtype = match.Groups[1].Value;
+
+                if (msgtype == "MsgType = QMI_UIM_CHANGE_PROVISIONING_SESSION")
+                {
+                    if (ctlflags == "SduCtlFlags = REQ")
+                    {
+                        string session = null;
+                        string action = null;
+                        string slot = null;
+                        if (Content.Count >= 25)
+                        {
+                            index += 8;
+                            match = Regex.Match(Content[index], @"            (.*)");
+                            session = match.Groups[1].Value;
+                            index++;
+                            match = Regex.Match(Content[index], @"            (.*)");
+                            action = match.Groups[1].Value;
+                            index += 7;
+                            match = Regex.Match(Content[index], @"            (.*)");
+                            slot = match.Groups[1].Value;
+                            extra = session + " " + action + " " + slot;
+                        }
+                    }
+                    else if (ctlflags == "SduCtlFlags = RSP")
+                    {
+                        if (Content.Count >= 17)
+                        {
+                            index += 8;
+                            match = Regex.Match(Content[index], @"            (.*)");
+                            extra = match.Groups[1].Value;
+                        }
+                    }
+                }
+
+            }
+            else
+            {
+                match = Regex.Match(Content[index], @"(ClientId = .*)");
+                if (match.Success)
+                {
+                    if (Content.Count < 10)
+                    {
+                        return;
+                    }
+                    client = Content[index];
+                    index++;
+                    ctlflags = Content[index];
+                    index++;
+                    txid = Content[index];
+                    index++;
+                    msgtype = Content[index];
+                }
+            }
+
+            if (msgtype != null && (msgtype.StartsWith("MsgType = QMI_UIM") || msgtype.StartsWith("MsgType = QMI_CAT")))
+            {
+                WriteDebugFile(String.Format("{0,-14}{1,-10} {2,-18} {3} {4}", client, txid, ctlflags, msgtype, extra));
+            }
+        }
+
+
+        private void HandleQMI()
+        {
+            if (Content.Count < 12)
+            {
+                return;
+            }
+
+            string type = null;
+            string counter = null;
+            string service = null;
+            string command = null;
+            Match match = null;
+            int index = 0;
+
+            index++;
+            type = Content[index];
+
+            index++;
+            counter = Content[index];
+
+            index += 7;
+            match = Regex.Match(Content[index], @"(.*) {");
+            if (!match.Success)
+            {
+                return;
+            }
+            service = match.Groups[1].Value;
+
+            index += 2;
+            match = Regex.Match(Content[index], @"      (.*) {");
+            if (!match.Success)
+            {
+                return;
+            }
+            command = match.Groups[1].Value;
+
+            string extra = null;
+
+            if (command == "uim_change_provisioning_session")
+            {
+                if (type == "MsgType = Request")
+                {
+                    if (Content.Count >= 25)
+                    {
+
+
+                        string slot = null;
+                        string session = null;
+                        string action = null;
+
+                        index += 5;
+                        match = Regex.Match(Content[index], @"               (.*)");
+                        session = match.Groups[1].Value;
+
+                        index++;
+                        match = Regex.Match(Content[index], @"               (.*)");
+                        action = match.Groups[1].Value;
+
+                        index += 7;
+                        match = Regex.Match(Content[index], @"               (.*)");
+                        slot = match.Groups[1].Value;
+
+                        extra = session + " " + action + " " + slot;
+                    }
+                }
+                else if (type == "MsgType = Response")
+                {
+                    if (Content.Count >= 18)
+                    {
+                        index += 5;
+                        match = Regex.Match(Content[index], @"               (.*)");
+                        extra = match.Groups[1].Value;
+                    }
+                }
+            }
+            else if (command == "pbm_all_pb_init_done")
+            {
+                if (Content.Count >= 20)
+                {
+                    string session = null;
+                    string mask = null;
+
+                    index += 7;
+                    match = Regex.Match(Content[index], @"                  (.*)");
+                    session = match.Groups[1].Value;
+
+                    index++;
+                    match = Regex.Match(Content[index], @"                  (.*)");
+                    mask = match.Groups[1].Value;
+                    extra = session + " " + mask;
+                }
+            }
+            else if ((command == "uim_write_record" || command == "uim_read_record" || command == "uim_read_transparent") && type == "MsgType = Request")
+            {
+                if (Content.Count >= 25)
+                {
+                    string session = null;
+                    int file = 0;
+
+                    index += 5;
+                    match = Regex.Match(Content[index], @"               (.*)");
+                    session = match.Groups[1].Value;
+
+                    index += 8;
+                    while (index < Content.Count)
+                    {
+                        match = Regex.Match(Content[index], @"               file_id = (.*)");
+                        index++;
+                        if (match.Success)
+                        {
+                            file = Convert.ToInt32(match.Groups[1].Value);
+                            extra = String.Format("{0} file_id = 0x{1:X}", session, file);
+                            break;
+                        }
+                    }
+                }
+            }
+
+            if (command !=null && (command.StartsWith("uim") || command.StartsWith("cat")))
+            {
+                WriteDebugFile(String.Format("{0,-13} {1,-16} {2,-20} {3} {4}", counter, service, type, command, extra));
+            }
+        }
+
         private void HandleDebugMsg()
         {
-            if(Content.Count == 0)
+            Name = null;
+            if (Content.Count == 0)
             {
                 return;
             }
             Match match = Regex.Match(Content[0], @"\t(\S*)\t(\d*)\t(\w)\t(.*)");
-            if(!match.Success)
+            if (!match.Success)
             {
                 return;
             }
-            string output = String.Format("{0} {1,20} {2,5} {3} {4}", TimeStamp, match.Groups[1].Value, match.Groups[2].Value, match.Groups[3].Value, match.Groups[4].Value);
-
-            if (MsgFileWriter == null) MsgFileWriter = new StreamWriter(Utils.BaseFileName + "_msg.txt");
-            MsgFileWriter.WriteLine(output);
-            
-            string cardFilter = @"gstk_init\s|Debounce logic ended successfully|Delay the powerup by|uim power up @|uim power down @|atr byte\[0|No. of Apps present|DF Present|Received MMGSDI_NOTIFY_LINK_EST_REQ|NV_UIM_SELECT_DEFAULT_USIM_APP_I Read|Handling cmd:0x26|Handling cmd:0x29|Handling cmd:0x30|Handling cmd:0x38|mmgsdi_util_select_first_app|Timed out on the command response|MMGSDI_FEATURE_MULTISIM_AUTO_PROVISIONING|Auto provisioning from MMGSDI EFS for App_type =|MMGSDI_CARD_INSERTED_EVT, slot:|MMGSDI_SESSION_CHANGED_EVT, app:|MMGSDI_PIN1_EVT, status:|MMGSDI_PERSO_EVT,|MMGSDI_SUBSCRIPTION_READY_EVT, app:|mmgsdi_session_manage_illegal_subscription|REMOVED_EVT, condition:";
-            string stkFilter = @"gstk_process_envelope_cmd:|In gstk_process_proactive_command|SENDING REFRESH REQ TO MMGSDI|END Proactive session|Generating CAT EVT REPORT IND for Proactive Cmd|IN GSTK_OPEN_CH_REQ|IN GSTK_PROVIDE_LOCAL_INFO_REQ|IN GSTK_SEND_DATA_REQ:|IN GSTK_MORE_TIME_REQ|IN GSTK_SETUP_MENU_REQ|IN GSTK_SETUP_IDLE_TXT_REQ|IN GSTK_CLOSE_CH_REQ|IN GSTK_SETUP_EVT_LIST_REQ|IN GSTK_RECEIVE_DATA_REQ:|IN GSTK_SEND_SS_REQ|IN GSTK_TIMER_MANAGEMENT_REQ|IN GSTK_polling_REQ|IN GSTK_SEND_ussd_REQ|Received Term rsp|gstk_send_raw_terminal_response|UIM envelope rsp queued to front of GSTK queue";
-            Match filter = null;
-            filter = Regex.Match(match.Groups[4].Value, cardFilter);
-            if(filter.Success)
-            {
-                if(CardFileWriter == null) CardFileWriter = new StreamWriter(Utils.BaseFileName + "_msg_card_init.txt");
-                CardFileWriter.WriteLine(output);
-            }
-            filter = Regex.Match(match.Groups[4].Value, stkFilter);
-            if (filter.Success)
-            {
-                if (StkFileWriter == null) StkFileWriter = new StreamWriter(Utils.BaseFileName + "_msg_stk.txt");
-                StkFileWriter.WriteLine(output);
-            }
+            WriteDebugFile(String.Format("{0,-20} {1,5} {2} {3}", match.Groups[1].Value, match.Groups[2].Value, match.Groups[3].Value, match.Groups[4].Value));
         }
 
         private void HandleDiagRsp()
@@ -317,7 +556,7 @@ namespace ProtocolDecoder
             {
                 string buildId = null;
                 index += 3;
-                if(index >= Content.Count)
+                if (index >= Content.Count)
                 {
                     return;
                 }
@@ -329,7 +568,7 @@ namespace ProtocolDecoder
                     if (buildId != BuildID)
                     {
                         BuildID = buildId;
-                        WriteApduFile(String.Format("{0},        Build ID: {1}", TimeStamp, buildId));
+                        WriteApduFile(String.Format("Build ID: {0}", buildId));
                     }
                 }
             }
@@ -362,7 +601,7 @@ namespace ProtocolDecoder
                 }
                 if (IMEI != imei || IMSI != imsi)
                 {
-                    WriteApduFile(String.Format("{0},        IMEI: {1}, IMSI: {2}", TimeStamp, imei, imsi));
+                    WriteApduFile(String.Format("IMEI: {0} IMSI: {1}", imei, imsi));
                     IMEI = imei;
                     IMSI = imsi;
                 }
@@ -370,6 +609,17 @@ namespace ProtocolDecoder
 
         }
 
+        public uint GetApduCount()
+        {
+            return ApduCounter;
+        }
+
+
+        /*0x138e, 0x138f, 0x1390, 0x1391, 0x1544, //QMI
+                    0xb0c0, 0xb0e2, 0xb0e3, 0xb0ec, 0xb0ed, //OTA LTE
+                    0x713a, 0x7b3a, 0xd0e3, 0x412f,         //OTA  UMTS, TDS, W
+                    0x1004, 0x1005, 0x1006, 0x1007, 0x1008, //OTA 1X
+        */
         public void Process()
         {
             if (IsValidItem())
@@ -377,9 +627,11 @@ namespace ProtocolDecoder
                 switch (Code)
                 {
                     case 0x14ce:
+                        ApduCounter++;
                         Handle14CE();
                         break;
                     case 0x1098:
+                        ApduCounter++;
                         Handle1098();
                         break;
                     case 0x1ff0:
@@ -387,6 +639,37 @@ namespace ProtocolDecoder
                         break;
                     case 0x1feb:
                         HandleDebugMsg();
+                        break;
+                    case 0x1544:
+                        HandleQMI();
+                        break;
+                    case 0x138e:
+                    case 0x138f:
+                    case 0x1390:
+                    case 0x1391:
+                    case 0x1392:
+                    case 0x1393:
+                    case 0x1394:
+                    case 0x1395:
+                    case 0x1396:
+                    case 0x1397:
+                        HandleQMI2();
+                        break;
+                    case 0xb0c0:
+                    case 0xb0e2:
+                    case 0xb0e3:
+                    case 0xb0ec:
+                    case 0xb0ed:
+                    case 0x713a:
+                    case 0x7b3a:
+                    case 0xd0e3:
+                    case 0x412f:
+                    case 0x1004:
+                    case 0x1005:
+                    case 0x1006:
+                    case 0x1007:
+                    case 0x1008:
+                        HandleOTA();
                         break;
                 }
             }

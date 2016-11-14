@@ -93,7 +93,6 @@ namespace ProtocolDecoder
                 iConfig.AddItem(6);//Message                
                 for (int i = 0; i < mask.MsgList.Length; i++)
                 {
-                    Debug.WriteLine("{0}", mask.MsgList[i]);
                     iConfig.AddMessage(mask.MsgList[i], 0);
                     iConfig.AddMessage(mask.MsgList[i], 1);
                     iConfig.AddMessage(mask.MsgList[i], 2);

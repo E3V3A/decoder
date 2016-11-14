@@ -43,7 +43,7 @@
             this.buttonDecodeUCS2 = new System.Windows.Forms.Button();
             this.button7Bit = new System.Windows.Forms.Button();
             this.tabPage2 = new System.Windows.Forms.TabPage();
-            this.checkBoxOTA = new System.Windows.Forms.CheckBox();
+            this.checkBoxMsg = new System.Windows.Forms.CheckBox();
             this.checkBoxSummary = new System.Windows.Forms.CheckBox();
             this.checkBoxTime = new System.Windows.Forms.CheckBox();
             this.buttonApdu = new System.Windows.Forms.Button();
@@ -61,7 +61,6 @@
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
             this.serialPort1 = new System.IO.Ports.SerialPort(this.components);
-            this.checkBoxMsg = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
@@ -236,7 +235,6 @@
             // tabPage2
             // 
             this.tabPage2.Controls.Add(this.checkBoxMsg);
-            this.tabPage2.Controls.Add(this.checkBoxOTA);
             this.tabPage2.Controls.Add(this.checkBoxSummary);
             this.tabPage2.Controls.Add(this.checkBoxTime);
             this.tabPage2.Controls.Add(this.buttonApdu);
@@ -252,17 +250,15 @@
             this.tabPage2.Text = "QXDM Log";
             this.tabPage2.UseVisualStyleBackColor = true;
             // 
-            // checkBoxOTA
+            // checkBoxMsg
             // 
-            this.checkBoxOTA.AutoSize = true;
-            this.checkBoxOTA.Checked = true;
-            this.checkBoxOTA.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.checkBoxOTA.Location = new System.Drawing.Point(457, 84);
-            this.checkBoxOTA.Name = "checkBoxOTA";
-            this.checkBoxOTA.Size = new System.Drawing.Size(103, 25);
-            this.checkBoxOTA.TabIndex = 9;
-            this.checkBoxOTA.Text = "OTA/QMI";
-            this.checkBoxOTA.UseVisualStyleBackColor = true;
+            this.checkBoxMsg.AutoSize = true;
+            this.checkBoxMsg.Location = new System.Drawing.Point(477, 83);
+            this.checkBoxMsg.Name = "checkBoxMsg";
+            this.checkBoxMsg.Size = new System.Drawing.Size(96, 25);
+            this.checkBoxMsg.TabIndex = 10;
+            this.checkBoxMsg.Text = "Message";
+            this.checkBoxMsg.UseVisualStyleBackColor = true;
             // 
             // checkBoxSummary
             // 
@@ -299,7 +295,7 @@
             // 
             // buttonConvertBinary
             // 
-            this.buttonConvertBinary.Location = new System.Drawing.Point(11, 149);
+            this.buttonConvertBinary.Location = new System.Drawing.Point(11, 245);
             this.buttonConvertBinary.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.buttonConvertBinary.Name = "buttonConvertBinary";
             this.buttonConvertBinary.Size = new System.Drawing.Size(207, 29);
@@ -424,18 +420,6 @@
             // 
             this.serialPort1.DataReceived += new System.IO.Ports.SerialDataReceivedEventHandler(this.serialPort1_DataReceived);
             // 
-            // checkBoxMsg
-            // 
-            this.checkBoxMsg.AutoSize = true;
-            this.checkBoxMsg.Checked = true;
-            this.checkBoxMsg.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.checkBoxMsg.Location = new System.Drawing.Point(577, 84);
-            this.checkBoxMsg.Name = "checkBoxMsg";
-            this.checkBoxMsg.Size = new System.Drawing.Size(96, 25);
-            this.checkBoxMsg.TabIndex = 10;
-            this.checkBoxMsg.Text = "Message";
-            this.checkBoxMsg.UseVisualStyleBackColor = true;
-            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 21F);
@@ -497,7 +481,6 @@
         private System.Windows.Forms.Button buttonConvertBinary;
         private System.Windows.Forms.CheckBox checkBoxTime;
         private System.Windows.Forms.CheckBox checkBoxSummary;
-        private System.Windows.Forms.CheckBox checkBoxOTA;
         private System.Windows.Forms.CheckBox checkBoxMsg;
     }
 }

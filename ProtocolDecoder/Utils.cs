@@ -39,8 +39,8 @@ namespace ProtocolDecoder
             try
             {
                 BaseFileName = Path.Combine(Path.GetDirectoryName(fileName), Path.GetFileNameWithoutExtension(fileName));
-                ExtractedFileName = BaseFileName + "_extracted.isf";
-                ExtractedTextName = BaseFileName + "_extracted.txt";
+                ExtractedFileName = BaseFileName + "_raw.isf";
+                ExtractedTextName = BaseFileName + "_raw.txt";
             }
             catch (Exception e)
             {

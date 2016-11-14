@@ -289,34 +289,7 @@ namespace ProtocolDecoder
 
         }
 
-        private void buttonConvertBinary_Click(object sender, EventArgs e)
-        {
-            string path = textBoxPath.Text;
 
-            if (!Utils.IsValidIsf(path))
-            {
-                toolStripStatusLabel2.Text = "file not exist or too larger than 1M";
-                toolStripStatusLabel2.ForeColor = Color.Red;
-            }
-
-            FileStream fs = new FileStream(path, FileMode.Open, FileAccess.Read);
-            byte[] bytes = new byte[fs.Length];
-            fs.Read(bytes, 0, bytes.Length);
-            fs.Close();
-
-            string basePathName = Path.Combine(Path.GetDirectoryName(path), Path.GetFileNameWithoutExtension(path));
-
-            StreamWriter sw = new StreamWriter(basePathName + "_ascii.txt");
-            for (int i = 0; i < bytes.Length; i++)
-            {
-                sw.Write(String.Format("{0:X2} ", bytes[i]));
-                if ((i + 1) % 16 == 0)
-                {
-                    sw.WriteLine();
-                }
-            }
-            sw.Close();
-        }
 
     }
 }

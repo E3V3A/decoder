@@ -47,7 +47,6 @@
             this.checkBoxSummary = new System.Windows.Forms.CheckBox();
             this.checkBoxTime = new System.Windows.Forms.CheckBox();
             this.buttonApdu = new System.Windows.Forms.Button();
-            this.buttonConvertBinary = new System.Windows.Forms.Button();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.toolStripStatusLabel2 = new System.Windows.Forms.ToolStripStatusLabel();
             this.textBoxPath = new System.Windows.Forms.TextBox();
@@ -238,7 +237,6 @@
             this.tabPage2.Controls.Add(this.checkBoxSummary);
             this.tabPage2.Controls.Add(this.checkBoxTime);
             this.tabPage2.Controls.Add(this.buttonApdu);
-            this.tabPage2.Controls.Add(this.buttonConvertBinary);
             this.tabPage2.Controls.Add(this.statusStrip1);
             this.tabPage2.Controls.Add(this.textBoxPath);
             this.tabPage2.Controls.Add(this.buttonLoad);
@@ -292,17 +290,6 @@
             this.buttonApdu.Text = "Extract APDU";
             this.buttonApdu.UseVisualStyleBackColor = true;
             this.buttonApdu.Click += new System.EventHandler(this.buttonApdu_Click);
-            // 
-            // buttonConvertBinary
-            // 
-            this.buttonConvertBinary.Location = new System.Drawing.Point(11, 245);
-            this.buttonConvertBinary.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.buttonConvertBinary.Name = "buttonConvertBinary";
-            this.buttonConvertBinary.Size = new System.Drawing.Size(207, 29);
-            this.buttonConvertBinary.TabIndex = 6;
-            this.buttonConvertBinary.Text = "Convert binary file to txt";
-            this.buttonConvertBinary.UseVisualStyleBackColor = true;
-            this.buttonConvertBinary.Click += new System.EventHandler(this.buttonConvertBinary_Click);
             // 
             // statusStrip1
             // 
@@ -478,7 +465,6 @@
         private System.Windows.Forms.Button buttonDecodeUCS2;
         private System.Windows.Forms.Button button7Bit;
         private System.Windows.Forms.Button buttonDecodeTimeStamp;
-        private System.Windows.Forms.Button buttonConvertBinary;
         private System.Windows.Forms.CheckBox checkBoxTime;
         private System.Windows.Forms.CheckBox checkBoxSummary;
         private System.Windows.Forms.CheckBox checkBoxMsg;

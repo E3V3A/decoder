@@ -9,6 +9,7 @@ using System.Text.RegularExpressions;
 using Microsoft.Win32;
 using System.ComponentModel;
 using System.Threading;
+using System.Windows.Forms;
 
 namespace ProtocolDecoder
 {
@@ -63,11 +64,11 @@ namespace ProtocolDecoder
 
             bw.ReportProgress(1, "extracting isf log");
 
-            LogMask mask = new LogMask(Utils.ExtractedFileName);
+            LogMask mask = new LogMask(Utils.RawIsfName);
             mask.LogList = new uint[] { 0x1098, 0x14ce };
             if (needMsg)
             {
-                mask.MsgList = new uint[] { 21, 6039};
+                mask.MsgList = new uint[] { 21, 6039 };
                 //PBM 6039
                 //QCRIL 63
                 //UIM 21
@@ -108,7 +109,7 @@ namespace ProtocolDecoder
             }
 
             bw.ReportProgress(1, "saving isf log to text");
-            if (!IsfAnalyzer.ConvetIsf2Text(Utils.ExtractedFileName, Utils.ExtractedTextName))
+            if (!IsfAnalyzer.ConvetIsf2Text(Utils.RawIsfName, Utils.RawTextName))
             {
                 bw.ReportProgress(0, "no valid log present in extracted isf");
                 IsfAnalyzer.Stop();
@@ -117,22 +118,22 @@ namespace ProtocolDecoder
             }
             QXDMProcessor.Stop();
             IsfAnalyzer.Stop();
-            File.Delete(Utils.ExtractedFileName);
+            File.Delete(Utils.RawIsfName);
 
             bw.ReportProgress(1, "decoding text file");
-            totalCount = DecodeText(Utils.ExtractedTextName, needSummary);
-            //File.Delete(Utils.ExtractedTextName);
+            totalCount = DecodeText(Utils.RawTextName, needSummary);
 
             string message = "total number of extracted apdu is " + totalCount;
-            /*string extra = null;
-            if (QXDMProcessor.IsBusy())
-            {
-                extra = ", still extracting qmi and ota log, do not close";
-            }*/
-
-            //bw.ReportProgress(1, message + extra);
-            
             bw.ReportProgress(1, message);
+
+            if (File.Exists(Utils.MsgFileName) && File.Exists("TextAnalysisTool.NET.exe"))
+            {
+                Process myProcess = new Process();
+                myProcess.StartInfo.FileName = "TextAnalysisTool.NET.exe";
+                myProcess.StartInfo.Arguments = "\"" + Utils.MsgFileName + "\" /Filters:UIM.tat";
+                myProcess.StartInfo.CreateNoWindow = false;
+                myProcess.Start();
+            }
         }
     }
 }

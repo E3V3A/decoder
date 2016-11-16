@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<TextAnalysisTool.NET version="2016-06-16" showOnlyFilteredLines="True">
+  <filters>
+    <filter enabled="y" excluding="n" description="MARK" foreColor="ee82ee" backColor="ffff00" type="marked" marker="1" />
+    <filter enabled="y" excluding="n" description="INIT" foreColor="800080" type="matches_text" case_sensitive="y" regex="y" text="gstk_init\s|Debounce logic ended successfully|Delay the powerup by|uim power up @|uim power down @|atr byte\[0|No. of Apps present|DF Present|Received MMGSDI_NOTIFY_LINK_EST_REQ|NV_UIM_SELECT_DEFAULT_USIM_APP_I Read|Handling cmd:0x26|Handling cmd:0x29|Handling cmd:0x30|Handling cmd:0x38|mmgsdi_util_select_first_app|Timed out on the command response|MMGSDI_FEATURE_MULTISIM_AUTO_PROVISIONING|Auto provisioning from MMGSDI EFS for App_type =|MMGSDI_CARD_INSERTED_EVT, slot:|MMGSDI_SESSION_CHANGED_EVT, app:|MMGSDI_PIN1_EVT, status:|MMGSDI_PERSO_EVT,|MMGSDI_SUBSCRIPTION_READY_EVT, app:|mmgsdi_session_manage_illegal_subscription|REMOVED_EVT, condition:" />
+    <filter enabled="y" excluding="n" description="STK" foreColor="0000ff" backColor="f0e68c" type="matches_text" case_sensitive="y" regex="y" text="gstk_process_envelope_cmd:|In gstk_process_proactive_command|SENDING REFRESH REQ TO MMGSDI|END Proactive session|Generating CAT EVT REPORT IND for Proactive Cmd|IN GSTK_OPEN_CH_REQ|IN GSTK_PROVIDE_LOCAL_INFO_REQ|IN GSTK_SEND_DATA_REQ:|IN GSTK_MORE_TIME_REQ|IN GSTK_SETUP_MENU_REQ|IN GSTK_SETUP_IDLE_TXT_REQ|IN GSTK_CLOSE_CH_REQ|IN GSTK_SETUP_EVT_LIST_REQ|IN GSTK_RECEIVE_DATA_REQ:|IN GSTK_SEND_SS_REQ|IN GSTK_TIMER_MANAGEMENT_REQ|IN GSTK_polling_REQ|IN GSTK_SEND_ussd_REQ|Received Term rsp|gstk_send_raw_terminal_response|UIM envelope rsp queued to front of GSTK queue" />
+    <filter enabled="y" excluding="n" description="QMI" backColor="90ee90" type="matches_text" case_sensitive="y" regex="n" text="MsgType = " />
+    <filter enabled="y" excluding="n" description="OTA" backColor="afeeee" type="matches_text" case_sensitive="n" regex="n" text="  --  " />
+    <filter enabled="n" excluding="n" description="UIM_2" backColor="d3d3d3" type="matches_text" case_sensitive="y" regex="n" text="UIM_2:" />
+    <filter enabled="n" excluding="n" description="UIM_1" backColor="add8e6" type="matches_text" case_sensitive="y" regex="n" text="UIM_1:" />
+    <filter enabled="n" excluding="n" description="APDU" backColor="7fffd4" type="matches_text" case_sensitive="y" regex="y" text="0x1098|0x14CE" />
+  </filters>
+</TextAnalysisTool.NET>

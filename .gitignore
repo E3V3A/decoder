@@ -3,3 +3,5 @@ ProtocolDecoder/bin/
 ProtocolDecoder/obj/
 ProtocolDecoder/·¢²¼/
 !ProtocolDecoder/bin/Debug/Interop.DMCoreAutomation.dll
+!ProtocolDecoder/bin/Debug/TextAnalysisTool.NET.exe
+!ProtocolDecoder/bin/Debug/UIM.tat

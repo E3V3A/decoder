@@ -14,11 +14,12 @@ namespace ProtocolDecoder
     class Utils
     {
         public static string BaseFileName = null;
-        public static string ExtractedFileName = null;
-        public static string ExtractedTextName = null;
+        public static string RawIsfName = null;
+        public static string RawTextName = null;
+        public static string MsgFileName = null;
+        public static string ApduFileName = null;
         public static byte[] ConvertInputToByteArray(string input)
         {
-
             string hexString = Regex.Replace(input, @"\s|(0x)", "");
             if (hexString.Length == 0 || Regex.IsMatch(hexString, @"[^0-9a-fA-F]"))
             {
@@ -39,8 +40,10 @@ namespace ProtocolDecoder
             try
             {
                 BaseFileName = Path.Combine(Path.GetDirectoryName(fileName), Path.GetFileNameWithoutExtension(fileName));
-                ExtractedFileName = BaseFileName + "_raw.isf";
-                ExtractedTextName = BaseFileName + "_raw.txt";
+                RawIsfName = BaseFileName + "_raw.isf";
+                RawTextName = BaseFileName + "_raw.txt";
+                MsgFileName = BaseFileName + "_msg.txt";
+                ApduFileName = BaseFileName + "_apdu.txt";
             }
             catch (Exception e)
             {

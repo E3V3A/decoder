@@ -39,9 +39,6 @@
             this.buttonExit = new System.Windows.Forms.Button();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
-            this.buttonDecodeTimeStamp = new System.Windows.Forms.Button();
-            this.buttonDecodeUCS2 = new System.Windows.Forms.Button();
-            this.button7Bit = new System.Windows.Forms.Button();
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.checkBoxMsg = new System.Windows.Forms.CheckBox();
             this.checkBoxSummary = new System.Windows.Forms.CheckBox();
@@ -144,7 +141,7 @@
             // 
             // buttonAbout
             // 
-            this.buttonAbout.Location = new System.Drawing.Point(620, 436);
+            this.buttonAbout.Location = new System.Drawing.Point(620, 194);
             this.buttonAbout.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.buttonAbout.Name = "buttonAbout";
             this.buttonAbout.Size = new System.Drawing.Size(94, 29);
@@ -155,7 +152,7 @@
             // 
             // buttonExit
             // 
-            this.buttonExit.Location = new System.Drawing.Point(620, 483);
+            this.buttonExit.Location = new System.Drawing.Point(620, 241);
             this.buttonExit.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.buttonExit.Name = "buttonExit";
             this.buttonExit.Size = new System.Drawing.Size(94, 29);
@@ -177,9 +174,6 @@
             // 
             // tabPage1
             // 
-            this.tabPage1.Controls.Add(this.buttonDecodeTimeStamp);
-            this.tabPage1.Controls.Add(this.buttonDecodeUCS2);
-            this.tabPage1.Controls.Add(this.button7Bit);
             this.tabPage1.Controls.Add(this.textBoxInput);
             this.tabPage1.Controls.Add(this.buttonExit);
             this.tabPage1.Controls.Add(this.dataGridView1);
@@ -195,41 +189,6 @@
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "Decoder";
             this.tabPage1.UseVisualStyleBackColor = true;
-            // 
-            // buttonDecodeTimeStamp
-            // 
-            this.buttonDecodeTimeStamp.Font = new System.Drawing.Font("微软雅黑", 8F);
-            this.buttonDecodeTimeStamp.Location = new System.Drawing.Point(620, 328);
-            this.buttonDecodeTimeStamp.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.buttonDecodeTimeStamp.Name = "buttonDecodeTimeStamp";
-            this.buttonDecodeTimeStamp.Size = new System.Drawing.Size(94, 52);
-            this.buttonDecodeTimeStamp.TabIndex = 11;
-            this.buttonDecodeTimeStamp.Text = "Decode Timestamp";
-            this.buttonDecodeTimeStamp.UseVisualStyleBackColor = true;
-            this.buttonDecodeTimeStamp.Click += new System.EventHandler(this.buttonDecodeTimeStamp_Click);
-            // 
-            // buttonDecodeUCS2
-            // 
-            this.buttonDecodeUCS2.Location = new System.Drawing.Point(620, 262);
-            this.buttonDecodeUCS2.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.buttonDecodeUCS2.Name = "buttonDecodeUCS2";
-            this.buttonDecodeUCS2.Size = new System.Drawing.Size(94, 52);
-            this.buttonDecodeUCS2.TabIndex = 10;
-            this.buttonDecodeUCS2.Text = "Decode UCS2";
-            this.buttonDecodeUCS2.UseVisualStyleBackColor = true;
-            this.buttonDecodeUCS2.Click += new System.EventHandler(this.buttonDecodeUCS2_Click);
-            // 
-            // button7Bit
-            // 
-            this.button7Bit.Font = new System.Drawing.Font("微软雅黑", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.button7Bit.Location = new System.Drawing.Point(620, 190);
-            this.button7Bit.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.button7Bit.Name = "button7Bit";
-            this.button7Bit.Size = new System.Drawing.Size(94, 51);
-            this.button7Bit.TabIndex = 9;
-            this.button7Bit.Text = "Decode Default 7bit";
-            this.button7Bit.UseVisualStyleBackColor = true;
-            this.button7Bit.Click += new System.EventHandler(this.buttonDecode7Bit_Click);
             // 
             // tabPage2
             // 
@@ -462,9 +421,6 @@
         private System.Windows.Forms.ComboBox comboBox1;
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel2;
         private System.Windows.Forms.Button buttonConnect;
-        private System.Windows.Forms.Button buttonDecodeUCS2;
-        private System.Windows.Forms.Button button7Bit;
-        private System.Windows.Forms.Button buttonDecodeTimeStamp;
         private System.Windows.Forms.CheckBox checkBoxTime;
         private System.Windows.Forms.CheckBox checkBoxSummary;
         private System.Windows.Forms.CheckBox checkBoxMsg;

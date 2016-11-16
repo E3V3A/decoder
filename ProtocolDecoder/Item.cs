@@ -24,7 +24,7 @@ namespace ProtocolDecoder
         private string IMEI = null;
         private string IMSI = null;
         private string BuildID = null;
-        private string Slot = "0";
+        //private string Slot = "0";
 
         public Item(bool hasSummary)
         {
@@ -35,8 +35,6 @@ namespace ProtocolDecoder
         {
             if (ApduFileWriter != null) ApduFileWriter.Close();
             if (MsgFileWriter != null) MsgFileWriter.Close();
-            //if (CardFileWriter != null) CardFileWriter.Close();
-            //if (StkFileWriter != null) StkFileWriter.Close();
         }
 
         public bool IsValidItem()
@@ -46,7 +44,6 @@ namespace ProtocolDecoder
         public void Clear()
         {
             TimeStamp = null;
-            Slot = "0";
             Content.Clear();
         }
         public void Add(string line)
@@ -190,10 +187,10 @@ namespace ProtocolDecoder
         {
             //sw.WriteLine(String.Format("{0,-7} {1} {2}", RawIndex, TimeStamp, line));
             StringBuilder sb = new StringBuilder(String.Format("{0,-7} {1} 0x{2:X4} ", RawIndex, TimeStamp, Code));
-            
-            if(Name != null)
+
+            if (Name != null)
             {
-                sb.Append(Name+" ");
+                sb.Append(Name + " ");
             }
 
             sw.WriteLine(sb.Append(line));
@@ -203,27 +200,24 @@ namespace ProtocolDecoder
         {
             if (ApduFileWriter == null)
             {
-                ApduFileWriter = new StreamWriter(Utils.BaseFileName + "_apdu.txt");
+                ApduFileWriter = new StreamWriter(Utils.ApduFileName);
             }
             WriteFile(ApduFileWriter, line);
+            WriteDebugFile(line);
         }
 
         private void WriteDebugFile(string line)
         {
             if (MsgFileWriter == null)
             {
-                MsgFileWriter = new StreamWriter(Utils.BaseFileName + "_msg.txt");
+                MsgFileWriter = new StreamWriter(Utils.MsgFileName);
             }
             WriteFile(MsgFileWriter, line);
         }
 
         //传入的数据以"APDU Parsing"开头
-        private void ProcessParsedAPDU(List<string> text)
+        private string GetAPDUSummary(List<string> text)
         {
-            if (!NeedSummary)
-            {
-                return;
-            }
             string apduType = null;
             int index = 2; ;
 
@@ -242,11 +236,11 @@ namespace ProtocolDecoder
             StringBuilder output = new StringBuilder();
             if (handler != null)
             {
-                WriteApduFile(String.Format("SLOT{0} Summary: {1}{2}", Slot, apduType, handler(text, index)));
+                return String.Format("Summary: {0}{1}", apduType, handler(text, index));
             }
             else
             {
-                WriteApduFile(String.Format("SLOT{0} Summary: {1}", Slot, apduType));
+                return String.Format("Summary: {0}", apduType);
             }
         }
 
@@ -260,13 +254,13 @@ namespace ProtocolDecoder
                 match = Regex.Match(Content[index], @"\t{4}([TR]X) {10}(.*)");
                 if (match.Success)
                 {
-                    WriteApduFile(String.Format("SLOT{0} {1}: {2}", Slot, match.Groups[1].Value, match.Groups[2].Value));
+                    WriteApduFile(String.Format("{0}: {1}", match.Groups[1].Value, match.Groups[2].Value));
                     continue;
                 }
 
-                if (Content[index].Contains("APDU Parsing"))
+                if (Content[index].Contains("APDU Parsing") && NeedSummary)
                 {
-                    ProcessParsedAPDU(Content.Skip(index).ToList());
+                    WriteApduFile(GetAPDUSummary(Content.Skip(index).ToList()));
                     break;
                 }
             }
@@ -279,6 +273,7 @@ namespace ProtocolDecoder
             Match match = null;
             int index = 0;
             bool found = false;
+            string slot = null;
 
             for (index = 0; index < Content.Count; index++)
             {
@@ -286,7 +281,7 @@ namespace ProtocolDecoder
                 if (match.Success)
                 {
                     direction = match.Groups[1].Value;
-                    Slot = match.Groups[2].Value;
+                    slot = match.Groups[2].Value;
                     apdu.Append(match.Groups[3].Value + " ");
                     continue;
                 }
@@ -297,11 +292,11 @@ namespace ProtocolDecoder
                     break;
                 }
             }
-            WriteApduFile(String.Format("SLOT{0} {1}: {2}", Slot, direction, apdu.ToString()));
+            WriteApduFile(String.Format("SLOT{0} {1}: {2}", slot, direction, apdu.ToString()));
 
-            if (found)
+            if (found && NeedSummary)
             {
-                ProcessParsedAPDU(Content.Skip(index).ToList());
+                WriteApduFile(String.Format("SLOT{0} {1}", slot, GetAPDUSummary(Content.Skip(index).ToList())));
             }
         }
 
@@ -527,7 +522,7 @@ namespace ProtocolDecoder
                 }
             }
 
-            if (command !=null && (command.StartsWith("uim") || command.StartsWith("cat")))
+            if (command != null && (command.StartsWith("uim") || command.StartsWith("cat")))
             {
                 WriteDebugFile(String.Format("{0,-13} {1,-16} {2,-20} {3} {4}", counter, service, type, command, extra));
             }
@@ -568,7 +563,7 @@ namespace ProtocolDecoder
                     if (buildId != BuildID)
                     {
                         BuildID = buildId;
-                        WriteApduFile(String.Format("Build ID: {0}", buildId));
+                        WriteApduFile(String.Format("{0}", buildId));
                     }
                 }
             }

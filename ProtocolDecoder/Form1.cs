@@ -213,7 +213,6 @@ namespace ProtocolDecoder
                 );
         }
 
-
         private void textBoxCommandLine_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Return && buttonSend.Enabled == true)
@@ -230,66 +229,5 @@ namespace ProtocolDecoder
                 comboBox1.Items.AddRange(SerialPort.GetPortNames());
             }
         }
-
-        private void buttonDecode7Bit_Click(object sender, EventArgs e)
-        {
-            TableOutputController.Clear();
-
-            byte[] bytes = Utils.ConvertInputToByteArray(textBoxInput.Text);
-
-            if (bytes == null)
-            {
-                TableOutputController.Format("Please input valid hex string");
-            }
-            else
-            {
-                textBoxInput.Text = BitConverter.ToString(bytes).Replace("-", " ");
-                TableOutputController.Format("Total string: ", GsmAlphabet.DecodeGSMDefault7BitText(bytes));
-
-            }
-            dataGridView1.ClearSelection();
-
-        }
-
-        private void buttonDecodeUCS2_Click(object sender, EventArgs e)
-        {
-            TableOutputController.Clear();
-
-            byte[] bytes = Utils.ConvertInputToByteArray(textBoxInput.Text);
-
-            if (bytes == null)
-            {
-                TableOutputController.Format("Please input valid hex string");
-            }
-            else
-            {
-                textBoxInput.Text = BitConverter.ToString(bytes).Replace("-", " ");
-                TableOutputController.Format("Total string: ", GsmAlphabet.Decode80Ucs2Text(bytes));
-
-            }
-            dataGridView1.ClearSelection();
-        }
-
-        private void buttonDecodeTimeStamp_Click(object sender, EventArgs e)
-        {
-            TableOutputController.Clear();
-            string timeStamp = textBoxInput.Text;
-            DateTime dtStart = TimeZone.CurrentTimeZone.ToLocalTime(new DateTime(1970, 1, 1));
-            try
-            {
-                long lTime = long.Parse(timeStamp + "0000000");
-                TimeSpan toNow = new TimeSpan(lTime);
-                DateTime dtResult = dtStart.Add(toNow);
-                TableOutputController.Format(dtResult.ToString());
-            }
-            catch
-            {
-                TableOutputController.Format("Invalid timestamp");
-            }
-
-        }
-
-
-
     }
 }

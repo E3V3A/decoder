@@ -53,7 +53,7 @@ namespace ProtocolDecoder
         
         public static bool IsValidIsf(string file)
         {
-            if (!File.Exists(file) || (Path.GetExtension(file) != ".isf" && Path.GetExtension(file) != ".qmdl"))
+            if (!File.Exists(file) || (Path.GetExtension(file) != ".isf"))
             {
                 return false;
             }

@@ -21,14 +21,16 @@ namespace ProtocolDecoder
         //private StreamWriter CardFileWriter = null;
         //private StreamWriter StkFileWriter = null;
         private bool NeedSummary = false;
+        private bool NeedMsg = false;
         private string IMEI = null;
         private string IMSI = null;
         private string BuildID = null;
         //private string Slot = "0";
 
-        public Item(bool hasSummary)
+        public Item(bool hasSummary, bool needMsg)
         {
             NeedSummary = hasSummary;
+            NeedMsg = needMsg;
         }
 
         public void CloseFile()
@@ -203,7 +205,10 @@ namespace ProtocolDecoder
                 ApduFileWriter = new StreamWriter(Utils.ApduFileName);
             }
             WriteFile(ApduFileWriter, line);
-            WriteDebugFile(line);
+            if (NeedMsg)
+            {
+                WriteDebugFile(line);
+            }
         }
 
         private void WriteDebugFile(string line)
@@ -397,10 +402,12 @@ namespace ProtocolDecoder
                 }
             }
 
-            if (msgtype != null && (msgtype.StartsWith("MsgType = QMI_UIM") || msgtype.StartsWith("MsgType = QMI_CAT")))
+            if (msgtype == null || (!msgtype.StartsWith("MsgType = QMI_UIM") && !msgtype.StartsWith("MsgType = QMI_CAT") && !msgtype.StartsWith("MsgType = QMI_PBM")))
             {
-                WriteDebugFile(String.Format("{0,-14}{1,-10} {2,-18} {3} {4}", client, txid, ctlflags, msgtype, extra));
+                return;
             }
+
+            WriteDebugFile(String.Format("{0,-14}{1,-10} {2,-18} {3} {4}", client, txid, ctlflags, msgtype, extra));
         }
 
 
@@ -440,8 +447,12 @@ namespace ProtocolDecoder
             }
             command = match.Groups[1].Value;
 
-            string extra = null;
+            if (command == null || (!command.StartsWith("uim") && !command.StartsWith("cat") && !command.StartsWith("pbm")))
+            {
+                return;
+            }
 
+            string extra = null;
             if (command == "uim_change_provisioning_session")
             {
                 if (type == "MsgType = Request")
@@ -521,11 +532,7 @@ namespace ProtocolDecoder
                     }
                 }
             }
-
-            if (command != null && (command.StartsWith("uim") || command.StartsWith("cat")))
-            {
-                WriteDebugFile(String.Format("{0,-13} {1,-16} {2,-20} {3} {4}", counter, service, type, command, extra));
-            }
+            WriteDebugFile(String.Format("{0,-13} {1,-16} {2,-20} {3} {4}", counter, service, type, command, extra));
         }
 
         private void HandleDebugMsg()
@@ -648,6 +655,28 @@ namespace ProtocolDecoder
                     case 0x1395:
                     case 0x1396:
                     case 0x1397:
+                    case 0x1398:
+                    case 0x1399:
+                    case 0x139a:
+                    case 0x139b:
+                    case 0x139c:
+                    case 0x139d:
+                    case 0x139e:
+                    case 0x139f:
+                    case 0x13a0:
+                    case 0x13a1:
+                    case 0x13a2:
+                    case 0x13a3:
+                    case 0x13a4:
+                    case 0x13a5:
+                    case 0x13a6:
+                    case 0x13a7:
+                    case 0x13a8:
+                    case 0x13a9:
+                    case 0x13aa:
+                    case 0x13ab:
+                    case 0x13ac:
+                    case 0x13ad:
                         HandleQMI2();
                         break;
                     case 0xb0c0:
@@ -664,6 +693,7 @@ namespace ProtocolDecoder
                     case 0x1006:
                     case 0x1007:
                     case 0x1008:
+                    case 0x5b2f:
                         HandleOTA();
                         break;
                 }

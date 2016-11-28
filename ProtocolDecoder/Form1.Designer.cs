@@ -267,6 +267,8 @@
             // 
             // textBoxPath
             // 
+            this.textBoxPath.AutoCompleteCustomSource.AddRange(new string[] {
+            "*.isf"});
             this.textBoxPath.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
             this.textBoxPath.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.FileSystem;
             this.textBoxPath.Location = new System.Drawing.Point(112, 20);

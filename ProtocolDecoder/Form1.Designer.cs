@@ -57,6 +57,7 @@
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
             this.serialPort1 = new System.IO.Ports.SerialPort(this.components);
+            this.checkBoxOta = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
@@ -192,6 +193,7 @@
             // 
             // tabPage2
             // 
+            this.tabPage2.Controls.Add(this.checkBoxOta);
             this.tabPage2.Controls.Add(this.checkBoxMsg);
             this.tabPage2.Controls.Add(this.checkBoxSummary);
             this.tabPage2.Controls.Add(this.checkBoxTime);
@@ -210,7 +212,7 @@
             // checkBoxMsg
             // 
             this.checkBoxMsg.AutoSize = true;
-            this.checkBoxMsg.Location = new System.Drawing.Point(477, 83);
+            this.checkBoxMsg.Location = new System.Drawing.Point(594, 83);
             this.checkBoxMsg.Name = "checkBoxMsg";
             this.checkBoxMsg.Size = new System.Drawing.Size(96, 25);
             this.checkBoxMsg.TabIndex = 10;
@@ -368,6 +370,16 @@
             // 
             this.serialPort1.DataReceived += new System.IO.Ports.SerialDataReceivedEventHandler(this.serialPort1_DataReceived);
             // 
+            // checkBoxOta
+            // 
+            this.checkBoxOta.AutoSize = true;
+            this.checkBoxOta.Location = new System.Drawing.Point(461, 84);
+            this.checkBoxOta.Name = "checkBoxOta";
+            this.checkBoxOta.Size = new System.Drawing.Size(103, 25);
+            this.checkBoxOta.TabIndex = 11;
+            this.checkBoxOta.Text = "QMI/OTA";
+            this.checkBoxOta.UseVisualStyleBackColor = true;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 21F);
@@ -426,6 +438,7 @@
         private System.Windows.Forms.CheckBox checkBoxTime;
         private System.Windows.Forms.CheckBox checkBoxSummary;
         private System.Windows.Forms.CheckBox checkBoxMsg;
+        private System.Windows.Forms.CheckBox checkBoxOta;
     }
 }
 

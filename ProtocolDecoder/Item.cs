@@ -16,20 +16,24 @@ namespace ProtocolDecoder
         private string Name = null;
         private List<string> Content = new List<string>();
         private StreamWriter ApduFileWriter = null;
+        private StreamWriter QMIFileWriter = null;
         private StreamWriter MsgFileWriter = null;
+        private StreamWriter OTAFileWriter = null;
         private uint ApduCounter = 0;
         //private StreamWriter CardFileWriter = null;
         //private StreamWriter StkFileWriter = null;
         private bool NeedSummary = false;
+        private bool NeedOta = false;
         private bool NeedMsg = false;
         private string IMEI = null;
         private string IMSI = null;
         private string BuildID = null;
         //private string Slot = "0";
 
-        public Item(bool hasSummary, bool needMsg)
+        public Item(bool hasSummary, bool needOta, bool needMsg)
         {
             NeedSummary = hasSummary;
+            NeedOta = needOta;
             NeedMsg = needMsg;
         }
 
@@ -185,9 +189,30 @@ namespace ProtocolDecoder
             }
         }
 
-        private void WriteFile(StreamWriter sw, string line)
+        private void WriteFileNoIndex(StreamWriter sw, string line)
         {
-            //sw.WriteLine(String.Format("{0,-7} {1} {2}", RawIndex, TimeStamp, line));
+            StringBuilder sb = new StringBuilder(String.Format("{0,-7} {1} 0x{2:X4} ", RawIndex, TimeStamp, Code));
+
+            if (Name != null)
+            {
+                sb.Append(Name + " ");
+            }
+
+            sw.WriteLine(sb.Append(line));
+        }
+
+
+        private void WriteDebugFile(string line)
+        {
+            if (MsgFileWriter == null)
+            {
+                MsgFileWriter = new StreamWriter(Utils.MsgFileName);
+            }
+            MsgFileWriter.WriteLine(TimeStamp+" "+line);
+        }
+
+        private void WriteFileWithIndex(StreamWriter sw, string line)
+        {
             StringBuilder sb = new StringBuilder(String.Format("{0,-7} {1} 0x{2:X4} ", RawIndex, TimeStamp, Code));
 
             if (Name != null)
@@ -204,21 +229,27 @@ namespace ProtocolDecoder
             {
                 ApduFileWriter = new StreamWriter(Utils.ApduFileName);
             }
-            WriteFile(ApduFileWriter, line);
-            if (NeedMsg)
-            {
-                WriteDebugFile(line);
-            }
+            WriteFileWithIndex(ApduFileWriter, line);
         }
 
-        private void WriteDebugFile(string line)
+        private void WriteOTAFile(string line)
         {
-            if (MsgFileWriter == null)
+            if (OTAFileWriter == null)
             {
-                MsgFileWriter = new StreamWriter(Utils.MsgFileName);
+                OTAFileWriter = new StreamWriter(Utils.OTAFileName);
             }
-            WriteFile(MsgFileWriter, line);
+            WriteFileWithIndex(OTAFileWriter, line);
         }
+
+        private void WriteQMIFile(string line)
+        {
+            if (QMIFileWriter == null)
+            {
+                QMIFileWriter = new StreamWriter(Utils.QMIFileName);
+            }
+            WriteFileWithIndex(QMIFileWriter, line);
+        }
+
 
         //传入的数据以"APDU Parsing"开头
         private string GetAPDUSummary(List<string> text)
@@ -307,7 +338,7 @@ namespace ProtocolDecoder
 
         private void HandleOTA()
         {
-            WriteDebugFile("");
+            WriteOTAFile("");
         }
 
         private void HandleQMI2()
@@ -402,12 +433,13 @@ namespace ProtocolDecoder
                 }
             }
 
-            if (msgtype == null || (!msgtype.StartsWith("MsgType = QMI_UIM") && !msgtype.StartsWith("MsgType = QMI_CAT") && !msgtype.StartsWith("MsgType = QMI_PBM")))
+            /*if (msgtype == null || (!msgtype.StartsWith("MsgType = QMI_UIM") && !msgtype.StartsWith("MsgType = QMI_CAT") && !msgtype.StartsWith("MsgType = QMI_PBM")))
             {
+                WriteQMIFile(String.Format("{0,-14}{1,-10} {2,-18} {3}", client, txid, ctlflags, msgtype));
                 return;
-            }
+            }*/
 
-            WriteDebugFile(String.Format("{0,-14}{1,-10} {2,-18} {3} {4}", client, txid, ctlflags, msgtype, extra));
+            WriteQMIFile(String.Format("{0,-14}{1,-10} {2,-18} {3} {4}", client, txid, ctlflags, msgtype, extra));
         }
 
 
@@ -447,10 +479,11 @@ namespace ProtocolDecoder
             }
             command = match.Groups[1].Value;
 
-            if (command == null || (!command.StartsWith("uim") && !command.StartsWith("cat") && !command.StartsWith("pbm")))
+            /*if (command == null || (!command.StartsWith("uim") && !command.StartsWith("cat") && !command.StartsWith("pbm")))
             {
+                WriteQMIFile(String.Format("{0,-13} {1,-16} {2,-20} {3}", counter, service, type, command));
                 return;
-            }
+            }*/
 
             string extra = null;
             if (command == "uim_change_provisioning_session")
@@ -532,7 +565,7 @@ namespace ProtocolDecoder
                     }
                 }
             }
-            WriteDebugFile(String.Format("{0,-13} {1,-16} {2,-20} {3} {4}", counter, service, type, command, extra));
+            WriteQMIFile(String.Format("{0,-13} {1,-16} {2,-20} {3} {4}", counter, service, type, command, extra));
         }
 
         private void HandleDebugMsg()

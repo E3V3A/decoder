@@ -18,6 +18,8 @@ namespace ProtocolDecoder
         public static string RawTextName = null;
         public static string MsgFileName = null;
         public static string ApduFileName = null;
+        public static string QMIFileName = null;
+        public static string OTAFileName = null;
         public static byte[] ConvertInputToByteArray(string input)
         {
             string hexString = Regex.Replace(input, @"\s|(0x)", "");
@@ -44,6 +46,8 @@ namespace ProtocolDecoder
                 RawTextName = BaseFileName + "_raw.txt";
                 MsgFileName = BaseFileName + "_msg.txt";
                 ApduFileName = BaseFileName + "_apdu.txt";
+                QMIFileName = BaseFileName + "_qmi.txt";
+                OTAFileName = BaseFileName + "_ota.txt";
             }
             catch (Exception e)
             {

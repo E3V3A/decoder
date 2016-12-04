@@ -38,7 +38,7 @@ namespace ProtocolDecoder
                 }
             }
             item.Process();
-            item.CloseFile();
+            item.Close();
             reader.Close();
             return item.GetApduCount();
         }
@@ -120,16 +120,6 @@ namespace ProtocolDecoder
 
             string message = "total number of extracted apdu is " + totalCount;
             bw.ReportProgress(1, message);
-
-            
-            /*if (File.Exists(Utils.MsgFileName) && File.Exists("TextAnalysisTool.NET.exe") && File.Exists("UIM.tat"))
-            {
-                Process myProcess = new Process();
-                myProcess.StartInfo.FileName = "TextAnalysisTool.NET.exe";
-                myProcess.StartInfo.Arguments = "\"" + Utils.MsgFileName + "\" /Filters:UIM.tat";
-                myProcess.StartInfo.CreateNoWindow = false;
-                myProcess.Start();
-            }*/
         }
     }
 }

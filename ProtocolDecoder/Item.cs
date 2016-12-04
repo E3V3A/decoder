@@ -37,10 +37,12 @@ namespace ProtocolDecoder
             NeedMsg = needMsg;
         }
 
-        public void CloseFile()
+        public void Close()
         {
             if (ApduFileWriter != null) ApduFileWriter.Close();
-            if (MsgFileWriter != null) MsgFileWriter.Close();
+            if (MsgFileWriter != null)  MsgFileWriter.Close();
+            if (QMIFileWriter != null)  QMIFileWriter.Close();
+            if (OTAFileWriter != null)  OTAFileWriter.Close();
         }
 
         public bool IsValidItem()
@@ -219,7 +221,6 @@ namespace ProtocolDecoder
             {
                 sb.Append(Name + " ");
             }
-
             sw.WriteLine(sb.Append(line));
         }
 

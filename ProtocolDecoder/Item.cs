@@ -16,33 +16,27 @@ namespace ProtocolDecoder
         private string Name = null;
         private List<string> Content = new List<string>();
         private StreamWriter ApduFileWriter = null;
-        private StreamWriter QMIFileWriter = null;
         private StreamWriter MsgFileWriter = null;
-        private StreamWriter OTAFileWriter = null;
         private uint ApduCounter = 0;
         //private StreamWriter CardFileWriter = null;
         //private StreamWriter StkFileWriter = null;
         private bool NeedSummary = false;
-        private bool NeedOta = false;
         private bool NeedMsg = false;
         private string IMEI = null;
         private string IMSI = null;
         private string BuildID = null;
         //private string Slot = "0";
 
-        public Item(bool hasSummary, bool needOta, bool needMsg)
+        public Item(bool hasSummary, bool needMsg)
         {
             NeedSummary = hasSummary;
-            NeedOta = needOta;
             NeedMsg = needMsg;
         }
 
         public void Close()
         {
             if (ApduFileWriter != null) ApduFileWriter.Close();
-            if (MsgFileWriter != null)  MsgFileWriter.Close();
-            if (QMIFileWriter != null)  QMIFileWriter.Close();
-            if (OTAFileWriter != null)  OTAFileWriter.Close();
+            if (MsgFileWriter != null) MsgFileWriter.Close();
         }
 
         public bool IsValidItem()
@@ -91,7 +85,7 @@ namespace ProtocolDecoder
                 if (match.Success)
                 {
                     UInt16 sfi = Convert.ToUInt16(match.Groups[1].Value, 16);
-                    return Format(String.Format("SFI: 0x{0:X2}", (sfi >> 3)));
+                    return String.Format("SFI: 0x{0:X2}", (sfi >> 3));
                 }
             }
             return null;
@@ -107,7 +101,7 @@ namespace ProtocolDecoder
                 index++;
                 if (match.Success)
                 {
-                    return Format("SFI: " + match.Groups[1].Value);
+                    return "SFI: " + match.Groups[1].Value;
                 }
             }
             return null;
@@ -123,7 +117,7 @@ namespace ProtocolDecoder
                 index++;
                 if (match.Success)
                 {
-                    return Format(match.Groups[1].Value);
+                    return match.Groups[1].Value;
                 }
             }
             return null;
@@ -139,7 +133,7 @@ namespace ProtocolDecoder
                 index++;
                 if (match.Success)
                 {
-                    return Format(match.Groups[1].Value);
+                    return match.Groups[1].Value;
                 }
             }
             return null;
@@ -176,33 +170,20 @@ namespace ProtocolDecoder
                     break;
                 }
             }
-            return Format(part1, part2);
+            return part1 + " " + part2;
         }
 
-        private static string Format(string part1, string part2 = null)
+        private void WriteFile(StreamWriter sw, string line)
         {
-            if (part2 == null)
+            if (Code == 0x1FEB)
             {
-                return ", " + part1;
+                sw.WriteLine(String.Format("{0,-7} {1} 0x{2:X4} {3}", RawIndex, TimeStamp, Code, line));
             }
             else
             {
-                return ", " + part1 + ", " + part2;
+                sw.WriteLine(String.Format("{0,-7} {1} 0x{2:X4} {3} {4}", RawIndex, TimeStamp, Code, Name, line));
             }
         }
-
-        private void WriteFileNoIndex(StreamWriter sw, string line)
-        {
-            StringBuilder sb = new StringBuilder(String.Format("{0,-7} {1} 0x{2:X4} ", RawIndex, TimeStamp, Code));
-
-            if (Name != null)
-            {
-                sb.Append(Name + " ");
-            }
-
-            sw.WriteLine(sb.Append(line));
-        }
-
 
         private void WriteDebugFile(string line)
         {
@@ -210,19 +191,9 @@ namespace ProtocolDecoder
             {
                 MsgFileWriter = new StreamWriter(Utils.MsgFileName);
             }
-            MsgFileWriter.WriteLine(TimeStamp+" "+line);
+            WriteFile(MsgFileWriter, line);
         }
 
-        private void WriteFileWithIndex(StreamWriter sw, string line)
-        {
-            StringBuilder sb = new StringBuilder(String.Format("{0,-7} {1} 0x{2:X4} ", RawIndex, TimeStamp, Code));
-
-            if (Name != null)
-            {
-                sb.Append(Name + " ");
-            }
-            sw.WriteLine(sb.Append(line));
-        }
 
         private void WriteApduFile(string line)
         {
@@ -230,27 +201,8 @@ namespace ProtocolDecoder
             {
                 ApduFileWriter = new StreamWriter(Utils.ApduFileName);
             }
-            WriteFileWithIndex(ApduFileWriter, line);
+            WriteFile(ApduFileWriter, line);
         }
-
-        private void WriteOTAFile(string line)
-        {
-            if (OTAFileWriter == null)
-            {
-                OTAFileWriter = new StreamWriter(Utils.OTAFileName);
-            }
-            WriteFileWithIndex(OTAFileWriter, line);
-        }
-
-        private void WriteQMIFile(string line)
-        {
-            if (QMIFileWriter == null)
-            {
-                QMIFileWriter = new StreamWriter(Utils.QMIFileName);
-            }
-            WriteFileWithIndex(QMIFileWriter, line);
-        }
-
 
         //传入的数据以"APDU Parsing"开头
         private string GetAPDUSummary(List<string> text)
@@ -270,15 +222,16 @@ namespace ProtocolDecoder
             }
             ParsedApduHandler handler = null;
             ParsedApduHandlerDictionary.TryGetValue(apduType, out handler);
-            StringBuilder output = new StringBuilder();
+
             if (handler != null)
             {
-                return String.Format("Summary: {0}{1}", apduType, handler(text, index));
+                string extra = handler(text, index);
+                if (extra != null)
+                {
+                    return String.Format("Summary: {0}, {1}", apduType, extra);
+                }
             }
-            else
-            {
-                return String.Format("Summary: {0}", apduType);
-            }
+            return String.Format("Summary: {0}", apduType);
         }
 
         private void Handle1098()
@@ -339,7 +292,7 @@ namespace ProtocolDecoder
 
         private void HandleOTA()
         {
-            WriteOTAFile("");
+            WriteDebugFile("");
         }
 
         private void HandleQMI2()
@@ -440,7 +393,7 @@ namespace ProtocolDecoder
                 return;
             }*/
 
-            WriteQMIFile(String.Format("{0,-14}{1,-10} {2,-18} {3} {4}", client, txid, ctlflags, msgtype, extra));
+            WriteDebugFile(String.Format("{0,-14}{1,-10} {2,-18} {3} {4}", client, txid, ctlflags, msgtype, extra));
         }
 
 
@@ -480,21 +433,13 @@ namespace ProtocolDecoder
             }
             command = match.Groups[1].Value;
 
-            /*if (command == null || (!command.StartsWith("uim") && !command.StartsWith("cat") && !command.StartsWith("pbm")))
-            {
-                WriteQMIFile(String.Format("{0,-13} {1,-16} {2,-20} {3}", counter, service, type, command));
-                return;
-            }*/
-
             string extra = null;
             if (command == "uim_change_provisioning_session")
             {
                 if (type == "MsgType = Request")
                 {
-                    if (Content.Count >= 25)
+                    if ((Content.Count -1) >= (index + 6))
                     {
-
-
                         string slot = null;
                         string session = null;
                         string action = null;
@@ -507,9 +452,12 @@ namespace ProtocolDecoder
                         match = Regex.Match(Content[index], @"               (.*)");
                         action = match.Groups[1].Value;
 
-                        index += 7;
-                        match = Regex.Match(Content[index], @"               (.*)");
-                        slot = match.Groups[1].Value;
+                        if ((Content.Count - 1) >= (index + 7))
+                        {
+                            index += 7;
+                            match = Regex.Match(Content[index], @"               (.*)");
+                            slot = match.Groups[1].Value;
+                        }
 
                         extra = session + " " + action + " " + slot;
                     }
@@ -566,12 +514,11 @@ namespace ProtocolDecoder
                     }
                 }
             }
-            WriteQMIFile(String.Format("{0,-13} {1,-16} {2,-20} {3} {4}", counter, service, type, command, extra));
+            WriteDebugFile(String.Format("{0,-13} {1,-16} {2,-20} {3} {4}", counter, service, type, command, extra));
         }
 
         private void HandleDebugMsg()
         {
-            Name = null;
             if (Content.Count == 0)
             {
                 return;

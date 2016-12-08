@@ -130,7 +130,7 @@ namespace ProtocolDecoder
         private void backgroundWorker1_DoWork(object sender, DoWorkEventArgs e)
         {
             string path = e.Argument.ToString();
-            IsfDecoder.DecodeIsf(path, (BackgroundWorker)sender, checkBoxTime.Checked, checkBoxSummary.Checked, checkBoxOta.Checked, checkBoxMsg.Checked);
+            IsfDecoder.DecodeIsf(path, (BackgroundWorker)sender, checkBoxTime.Checked, checkBoxSummary.Checked, checkBoxMsg.Checked);
         }
 
         private void backgroundWorker1_ProgressChanged(object sender, ProgressChangedEventArgs e)
@@ -228,6 +228,11 @@ namespace ProtocolDecoder
                 comboBox1.Items.Clear();
                 comboBox1.Items.AddRange(SerialPort.GetPortNames());
             }
+        }
+
+        private void checkBoxMsg_CheckedChanged(object sender, EventArgs e)
+        {
+
         }
     }
 }

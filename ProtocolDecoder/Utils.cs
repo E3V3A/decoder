@@ -46,8 +46,8 @@ namespace ProtocolDecoder
                 RawTextName = BaseFileName + "_raw.txt";
                 MsgFileName = BaseFileName + "_msg.txt";
                 ApduFileName = BaseFileName + "_apdu.txt";
-                QMIFileName = BaseFileName + "_qmi.txt";
-                OTAFileName = BaseFileName + "_ota.txt";
+                QMIFileName = MsgFileName;
+                OTAFileName = MsgFileName;
             }
             catch (Exception e)
             {

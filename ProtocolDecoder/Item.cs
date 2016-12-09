@@ -425,7 +425,7 @@ namespace ProtocolDecoder
             }
             service = match.Groups[1].Value;
 
-            index += 2;
+            index += 2;// 当前index预期指向command
             match = Regex.Match(Content[index], @"      (.*) {");
             if (!match.Success)
             {
@@ -436,65 +436,70 @@ namespace ProtocolDecoder
             string extra = null;
             if (command == "uim_change_provisioning_session")
             {
-                if (type == "MsgType = Request")
+                if (type.Contains("Request"))
                 {
-                    if ((Content.Count -1) >= (index + 6))
+                    if (Content.Count > (index + 6))
                     {
                         string slot = null;
                         string session = null;
                         string action = null;
 
                         index += 5;
-                        match = Regex.Match(Content[index], @"               (.*)");
-                        session = match.Groups[1].Value;
+                        session = Content[index].Substring(15);
 
                         index++;
-                        match = Regex.Match(Content[index], @"               (.*)");
-                        action = match.Groups[1].Value;
+                        action = Content[index].Substring(15);
 
-                        if ((Content.Count - 1) >= (index + 7))
+                        if (Content.Count > (index + 7))
                         {
                             index += 7;
-                            match = Regex.Match(Content[index], @"               (.*)");
-                            slot = match.Groups[1].Value;
+                            slot = Content[index].Substring(15);
                         }
 
                         extra = session + " " + action + " " + slot;
                     }
                 }
-                else if (type == "MsgType = Response")
+                else if (type.Contains("Response"))
                 {
                     if (Content.Count >= 18)
                     {
                         index += 5;
-                        match = Regex.Match(Content[index], @"               (.*)");
-                        extra = match.Groups[1].Value;
+                        extra = Content[index].Substring(15);
                     }
+                }
+            }
+            else if (command == "uim_power_down")
+            {
+                if (Content.Count > (index + 5))
+                {
+                    index += 5;
+                    extra = Content[index].Substring(15);
                 }
             }
             else if (command == "pbm_all_pb_init_done")
             {
-                if (Content.Count >= 20)
+                if (Content.Count > (index + 8))
                 {
                     string session = null;
                     string mask = null;
 
                     index += 7;
-                    match = Regex.Match(Content[index], @"                  (.*)");
-                    session = match.Groups[1].Value;
+                    if (Content[index].Length > 18)
+                    {
+                        session = Content[index].Substring(18);
 
-                    index++;
-                    match = Regex.Match(Content[index], @"                  (.*)");
-                    mask = match.Groups[1].Value;
-                    extra = session + " " + mask;
+                        index++;
+                        mask = Content[index].Substring(18);
+
+                        extra = session + " " + mask;
+                    }
                 }
             }
-            else if ((command == "uim_write_record" || command == "uim_read_record" || command == "uim_read_transparent") && type == "MsgType = Request")
+            else if ((command == "uim_write_record" || command == "uim_read_record" || command == "uim_read_transparent") && type.Contains("Request"))
             {
-                if (Content.Count >= 25)
+                if (Content.Count > (index + 13))
                 {
                     string session = null;
-                    int file = 0;
 
                     index += 5;
                     match = Regex.Match(Content[index], @"               (.*)");
@@ -507,8 +512,7 @@ namespace ProtocolDecoder
                         index++;
                         if (match.Success)
                         {
-                            file = Convert.ToInt32(match.Groups[1].Value);
-                            extra = String.Format("{0} file_id = 0x{1:X}", session, file);
+                            extra = String.Format("{0} file_id = 0x{1:X}", session, Convert.ToInt32(match.Groups[1].Value));
                             break;
                         }
                     }

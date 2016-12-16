@@ -210,11 +210,11 @@
             // checkBoxMsg
             // 
             this.checkBoxMsg.AutoSize = true;
-            this.checkBoxMsg.Location = new System.Drawing.Point(425, 80);
+            this.checkBoxMsg.Location = new System.Drawing.Point(513, 84);
             this.checkBoxMsg.Name = "checkBoxMsg";
-            this.checkBoxMsg.Size = new System.Drawing.Size(96, 25);
+            this.checkBoxMsg.Size = new System.Drawing.Size(134, 25);
             this.checkBoxMsg.TabIndex = 10;
-            this.checkBoxMsg.Text = "Message";
+            this.checkBoxMsg.Text = "UIM Message";
             this.checkBoxMsg.UseVisualStyleBackColor = true;
             this.checkBoxMsg.CheckedChanged += new System.EventHandler(this.checkBoxMsg_CheckedChanged);
             // 
@@ -223,17 +223,17 @@
             this.checkBoxSummary.AutoSize = true;
             this.checkBoxSummary.Checked = true;
             this.checkBoxSummary.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.checkBoxSummary.Location = new System.Drawing.Point(317, 80);
+            this.checkBoxSummary.Location = new System.Drawing.Point(213, 84);
             this.checkBoxSummary.Name = "checkBoxSummary";
-            this.checkBoxSummary.Size = new System.Drawing.Size(101, 25);
+            this.checkBoxSummary.Size = new System.Drawing.Size(151, 25);
             this.checkBoxSummary.TabIndex = 8;
-            this.checkBoxSummary.Text = "Summary";
+            this.checkBoxSummary.Text = "APDU Summary";
             this.checkBoxSummary.UseVisualStyleBackColor = true;
             // 
             // checkBoxTime
             // 
             this.checkBoxTime.AutoSize = true;
-            this.checkBoxTime.Location = new System.Drawing.Point(186, 80);
+            this.checkBoxTime.Location = new System.Drawing.Point(367, 84);
             this.checkBoxTime.Name = "checkBoxTime";
             this.checkBoxTime.Size = new System.Drawing.Size(125, 25);
             this.checkBoxTime.TabIndex = 7;
@@ -245,7 +245,7 @@
             this.buttonApdu.Location = new System.Drawing.Point(11, 80);
             this.buttonApdu.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.buttonApdu.Name = "buttonApdu";
-            this.buttonApdu.Size = new System.Drawing.Size(122, 29);
+            this.buttonApdu.Size = new System.Drawing.Size(123, 29);
             this.buttonApdu.TabIndex = 4;
             this.buttonApdu.Text = "Extract APDU";
             this.buttonApdu.UseVisualStyleBackColor = true;

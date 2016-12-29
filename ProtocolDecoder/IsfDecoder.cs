@@ -74,6 +74,7 @@ namespace ProtocolDecoder
                     0xb0c0, 0xb0e2, 0xb0e3, 0xb0ec, 0xb0ed, //OTA LTE
                     0x713a, 0x7b3a, 0xd0e3, 0x412f, 0x5b2f, //OTA  UMTS, TDS, W, GSM
                     0x1004, 0x1005, 0x1006, 0x1007, 0x1008, //OTA 1X
+                    0x156e, 0x1830, 0x1831, 0x1832, //IMS
                 };
                 mask.MsgList = new uint[] { 21, 6039 };
             }

@@ -25,7 +25,7 @@ namespace ProtocolDecoder
                 Debug.WriteLine("Error:  Failed to initialize ISF interface");
                 return false;
             }
-
+            
             isfHandler = iIsf.LoadItemStore(sourceFile);
             if (isfHandler == 0xFFFFFFFF)
             {

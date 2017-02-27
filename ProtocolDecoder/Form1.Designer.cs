@@ -40,8 +40,6 @@
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.tabPage2 = new System.Windows.Forms.TabPage();
-            this.checkBoxMsg = new System.Windows.Forms.CheckBox();
-            this.checkBoxSummary = new System.Windows.Forms.CheckBox();
             this.checkBoxTime = new System.Windows.Forms.CheckBox();
             this.buttonApdu = new System.Windows.Forms.Button();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
@@ -192,8 +190,6 @@
             // 
             // tabPage2
             // 
-            this.tabPage2.Controls.Add(this.checkBoxMsg);
-            this.tabPage2.Controls.Add(this.checkBoxSummary);
             this.tabPage2.Controls.Add(this.checkBoxTime);
             this.tabPage2.Controls.Add(this.buttonApdu);
             this.tabPage2.Controls.Add(this.statusStrip1);
@@ -207,45 +203,22 @@
             this.tabPage2.Text = "QXDM Log";
             this.tabPage2.UseVisualStyleBackColor = true;
             // 
-            // checkBoxMsg
-            // 
-            this.checkBoxMsg.AutoSize = true;
-            this.checkBoxMsg.Location = new System.Drawing.Point(513, 84);
-            this.checkBoxMsg.Name = "checkBoxMsg";
-            this.checkBoxMsg.Size = new System.Drawing.Size(134, 25);
-            this.checkBoxMsg.TabIndex = 10;
-            this.checkBoxMsg.Text = "UIM Message";
-            this.checkBoxMsg.UseVisualStyleBackColor = true;
-            this.checkBoxMsg.CheckedChanged += new System.EventHandler(this.checkBoxMsg_CheckedChanged);
-            // 
-            // checkBoxSummary
-            // 
-            this.checkBoxSummary.AutoSize = true;
-            this.checkBoxSummary.Checked = true;
-            this.checkBoxSummary.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.checkBoxSummary.Location = new System.Drawing.Point(213, 84);
-            this.checkBoxSummary.Name = "checkBoxSummary";
-            this.checkBoxSummary.Size = new System.Drawing.Size(151, 25);
-            this.checkBoxSummary.TabIndex = 8;
-            this.checkBoxSummary.Text = "APDU Summary";
-            this.checkBoxSummary.UseVisualStyleBackColor = true;
-            // 
             // checkBoxTime
             // 
             this.checkBoxTime.AutoSize = true;
-            this.checkBoxTime.Location = new System.Drawing.Point(367, 84);
+            this.checkBoxTime.Location = new System.Drawing.Point(277, 191);
             this.checkBoxTime.Name = "checkBoxTime";
-            this.checkBoxTime.Size = new System.Drawing.Size(125, 25);
+            this.checkBoxTime.Size = new System.Drawing.Size(122, 25);
             this.checkBoxTime.TabIndex = 7;
-            this.checkBoxTime.Text = "Use PC Time";
+            this.checkBoxTime.Text = "Use PC time";
             this.checkBoxTime.UseVisualStyleBackColor = true;
             // 
             // buttonApdu
             // 
-            this.buttonApdu.Location = new System.Drawing.Point(11, 80);
+            this.buttonApdu.Location = new System.Drawing.Point(26, 174);
             this.buttonApdu.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.buttonApdu.Name = "buttonApdu";
-            this.buttonApdu.Size = new System.Drawing.Size(123, 29);
+            this.buttonApdu.Size = new System.Drawing.Size(123, 56);
             this.buttonApdu.TabIndex = 4;
             this.buttonApdu.Text = "Extract APDU";
             this.buttonApdu.UseVisualStyleBackColor = true;
@@ -272,17 +245,18 @@
             "*.isf"});
             this.textBoxPath.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
             this.textBoxPath.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.FileSystem;
-            this.textBoxPath.Location = new System.Drawing.Point(112, 20);
+            this.textBoxPath.Location = new System.Drawing.Point(130, 52);
             this.textBoxPath.Name = "textBoxPath";
-            this.textBoxPath.Size = new System.Drawing.Size(601, 29);
+            this.textBoxPath.Size = new System.Drawing.Size(593, 29);
             this.textBoxPath.TabIndex = 2;
+            this.textBoxPath.Text = "Click button or input path";
             // 
             // buttonLoad
             // 
-            this.buttonLoad.Location = new System.Drawing.Point(11, 19);
+            this.buttonLoad.Location = new System.Drawing.Point(26, 40);
             this.buttonLoad.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.buttonLoad.Name = "buttonLoad";
-            this.buttonLoad.Size = new System.Drawing.Size(94, 29);
+            this.buttonLoad.Size = new System.Drawing.Size(94, 51);
             this.buttonLoad.TabIndex = 1;
             this.buttonLoad.Text = "Load ISF";
             this.buttonLoad.UseVisualStyleBackColor = true;
@@ -425,8 +399,6 @@
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel2;
         private System.Windows.Forms.Button buttonConnect;
         private System.Windows.Forms.CheckBox checkBoxTime;
-        private System.Windows.Forms.CheckBox checkBoxSummary;
-        private System.Windows.Forms.CheckBox checkBoxMsg;
     }
 }
 

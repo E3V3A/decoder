@@ -18,19 +18,14 @@ namespace ProtocolDecoder
         private StreamWriter ApduFileWriter = null;
         private StreamWriter MsgFileWriter = null;
         private uint ApduCounter = 0;
-        //private StreamWriter CardFileWriter = null;
-        //private StreamWriter StkFileWriter = null;
-        private bool NeedSummary = false;
-        private bool NeedMsg = false;
+        
         private string IMEI = null;
         private string IMSI = null;
         private string BuildID = null;
         //private string Slot = "0";
 
-        public Item(bool hasSummary, bool needMsg)
+        public Item()
         {
-            NeedSummary = hasSummary;
-            NeedMsg = needMsg;
         }
 
         public void Close()
@@ -202,6 +197,7 @@ namespace ProtocolDecoder
                 ApduFileWriter = new StreamWriter(Utils.ApduFileName);
             }
             WriteFile(ApduFileWriter, line);
+            WriteDebugFile(line);
         }
 
         //传入的数据以"APDU Parsing"开头
@@ -248,7 +244,7 @@ namespace ProtocolDecoder
                     continue;
                 }
 
-                if (Content[index].Contains("APDU Parsing") && NeedSummary)
+                if (Content[index].Contains("APDU Parsing"))
                 {
                     WriteApduFile(GetAPDUSummary(Content.Skip(index).ToList()));
                     break;
@@ -284,7 +280,7 @@ namespace ProtocolDecoder
             }
             WriteApduFile(String.Format("SLOT{0} {1}: {2}", slot, direction, apdu.ToString()));
 
-            if (found && NeedSummary)
+            if (found)
             {
                 WriteApduFile(String.Format("SLOT{0} {1}", slot, GetAPDUSummary(Content.Skip(index).ToList())));
             }
@@ -664,6 +660,10 @@ namespace ProtocolDecoder
                     case 0x13ad:
                         HandleQMI2();
                         break;
+                ////0xb0c0, 0xb0e2, 0xb0e3, 0xb0ec, 0xb0ed, //OTA LTE
+                ////0x713a, 0x7b3a, 0xd0e3, 0x412f, 0x5b2f, //OTA  UMTS, TDS, W, GSM
+                ////0x1004, 0x1005, 0x1006, 0x1007, 0x1008, //OTA 1X
+                ////0x156e, 0x1830, 0x1831, 0x1832, //IMS
                     case 0xb0c0:
                     case 0xb0e2:
                     case 0xb0e3:
@@ -673,12 +673,16 @@ namespace ProtocolDecoder
                     case 0x7b3a:
                     case 0xd0e3:
                     case 0x412f:
+                    case 0x5b2f:
                     case 0x1004:
                     case 0x1005:
                     case 0x1006:
                     case 0x1007:
                     case 0x1008:
-                    case 0x5b2f:
+                    case 0x156e:
+                    case 0x1830:
+                    case 0x1831:
+                    case 0x1832:
                         HandleOTA();
                         break;
                 }

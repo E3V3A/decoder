@@ -12,6 +12,7 @@ using System.Diagnostics;
 using System.IO.Ports;
 using System.IO;
 using System.Reflection;
+using Microsoft.Win32;
 
 namespace ProtocolDecoder
 {
@@ -130,7 +131,7 @@ namespace ProtocolDecoder
         private void backgroundWorker1_DoWork(object sender, DoWorkEventArgs e)
         {
             string path = e.Argument.ToString();
-            IsfDecoder.DecodeIsf(path, (BackgroundWorker)sender, checkBoxTime.Checked, checkBoxSummary.Checked, checkBoxMsg.Checked);
+            IsfDecoder.DecodeIsf(path, (BackgroundWorker)sender, checkBoxTime.Checked);
         }
 
         private void backgroundWorker1_ProgressChanged(object sender, ProgressChangedEventArgs e)
@@ -230,9 +231,6 @@ namespace ProtocolDecoder
             }
         }
 
-        private void checkBoxMsg_CheckedChanged(object sender, EventArgs e)
-        {
 
-        }
     }
 }

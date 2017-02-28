@@ -247,7 +247,7 @@ namespace ProtocolDecoder
                 if (Content[index].Contains("APDU Parsing"))
                 {
                     WriteApduFile(GetAPDUSummary(Content.Skip(index).ToList()));
-                    break;
+                    //break;//有些日志在APDU Parsing后仍然存在APDU行
                 }
             }
         }

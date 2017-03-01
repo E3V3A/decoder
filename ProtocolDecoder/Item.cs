@@ -168,36 +168,40 @@ namespace ProtocolDecoder
             return part1 + " " + part2;
         }
 
-        private void WriteFile(StreamWriter sw, string line)
+        private void WriteFile(StreamWriter sw, string line, string time = null)
         {
+            if(time == null)
+            {
+                time = TimeStamp;
+            }
             if (Code == 0x1FEB)
             {
-                sw.WriteLine(String.Format("{0,-7} {1} 0x{2:X4} {3}", RawIndex, TimeStamp, Code, line));
+                sw.WriteLine(String.Format("{0,-7} {1} 0x{2:X4} {3}", RawIndex, time, Code, line));
             }
             else
             {
-                sw.WriteLine(String.Format("{0,-7} {1} 0x{2:X4} {3} {4}", RawIndex, TimeStamp, Code, Name, line));
+                sw.WriteLine(String.Format("{0,-7} {1} 0x{2:X4} {3} {4}", RawIndex, time, Code, Name, line));
             }
         }
 
-        private void WriteDebugFile(string line)
+        private void WriteDebugFile(string line, string time = null)
         {
             if (MsgFileWriter == null)
             {
                 MsgFileWriter = new StreamWriter(Utils.MsgFileName);
             }
-            WriteFile(MsgFileWriter, line);
+            WriteFile(MsgFileWriter, line, time);
         }
 
 
-        private void WriteApduFile(string line)
+        private void WriteApduFile(string line, string time = null)
         {
             if (ApduFileWriter == null)
             {
                 ApduFileWriter = new StreamWriter(Utils.ApduFileName);
             }
-            WriteFile(ApduFileWriter, line);
-            WriteDebugFile(line);
+            WriteFile(ApduFileWriter, line, time);
+            WriteDebugFile(line, time);
         }
 
         //传入的数据以"APDU Parsing"开头
@@ -234,7 +238,8 @@ namespace ProtocolDecoder
         {
             Match match = null;
             int index = 0;
-
+// 统一采用日志行的时间戳
+#if false
             for (index = 0; index < Content.Count; index++)
             {
                 match = Regex.Match(Content[index], @"\t{4}([TR]X) {10}(.*)");
@@ -244,12 +249,50 @@ namespace ProtocolDecoder
                     continue;
                 }
 
-                if (Content[index].Contains("APDU Parsing"))
+                else if (Content[index].Contains("APDU Parsing"))
                 {
                     WriteApduFile(GetAPDUSummary(Content.Skip(index).ToList()));
                     //break;//有些日志在APDU Parsing后仍然存在APDU行
                 }
             }
+#endif
+#if true
+            for (index = 0; index < Content.Count; index++) 
+            {
+                string line = null;
+                string parsing = null;
+                string time = null;
+                match = Regex.Match(Content[index], @"\t{4}([TR]X) {10}(.*)");
+                if (match.Success)
+                {
+                    line = String.Format("{0}: {1}", match.Groups[1].Value, match.Groups[2].Value);
+                    index++;
+
+                    if (Content[index].Contains("APDU Parsing"))
+                    {
+                        parsing = GetAPDUSummary(Content.Skip(index).ToList());
+                    }
+                    index++;
+
+                    while(index < Content.Count)
+                    {
+                        match = Regex.Match(Content[index], @"\t{2}(..:..:..\....)");
+                        if(match.Success)
+                        {
+                            time = match.Groups[1].Value;
+                            Debug.WriteLine(time);
+                            WriteApduFile(line, time);
+                            if(parsing!=null)
+                            {
+                                WriteApduFile(parsing, time);
+                            }
+                            break;//跳出查找时间戳的循环
+                        }
+                        index++;//继续查找时间戳
+                    }
+                }
+            }
+#endif
         }
 
         private void Handle14CE()

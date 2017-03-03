@@ -25,6 +25,15 @@ namespace ProtocolDecoder
         private static IIsfAnalyzer handler = null;
         public static bool Start(bool usePCTime)
         {
+            if (Registry.ClassesRoot.OpenSubKey("QCAT6.Application") != null)
+            {
+                handler = new QCATAnalyzer();
+                if (handler.Start(usePCTime))
+                {
+                    return true;
+                }
+            }
+
             if (Registry.ClassesRoot.OpenSubKey("APEX6.Application") != null)
             {
                 handler = new APEXAnalyzer();
@@ -33,14 +42,7 @@ namespace ProtocolDecoder
                     return true;
                 }
             }
-            if (Registry.ClassesRoot.OpenSubKey("QCAT6.Application") != null)
-            {
-                handler = new APEXAnalyzer();
-                if (handler.Start(usePCTime))
-                {
-                    return true;
-                }
-            }
+            
             handler = null;
             return false;
         }

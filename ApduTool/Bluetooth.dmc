@@ -1,0 +1,37 @@
+<QXDMProfessional>
+ <Persistence>
+  <Displays>
+   <Display0>
+    <Frame>
+     <Show>1</Show>
+    </Frame>
+    <View>
+     <ISVConfig>
+      <Items>5</Items>
+      <DIAGRequests></DIAGRequests>
+      <DIAGResponses></DIAGResponses>
+      <SubsystemRequests></SubsystemRequests>
+      <SubsystemResponses></SubsystemResponses>
+      <EventIDs></EventIDs>
+      <LogCodes>0x103A,0x103E,0x103F,0x1040,0x1041,0x1042,0x1043,0x1044,0x1045,0x1046,0x1048,0x1049,0x104A,0x104B,0x104C,0x104D,0x104E,0x104F,0x1050,0x1051,0x1052,0x1053,0x1054,0x1055,0x1357,0x1358,0x1365,0x1366,0x1367,0x1368,0x1369,0x1485</LogCodes>
+      <OTATypes></OTATypes>
+      <MessageLevels></MessageLevels>
+      <StringTypes></StringTypes>
+     </ISVConfig>
+    </View>
+    <Type>Filtered View</Type>
+    <Tag></Tag>
+   </Display0>
+   <Display1>
+    <Frame>
+     <Show>1</Show>
+    </Frame>
+    <Type>Item View</Type>
+   </Display1>
+  </Displays>
+  <BuildVersion>01.00.036</BuildVersion>
+  <MultiInstance>0</MultiInstance>
+  <FixedFontFace></FixedFontFace>
+  <FixedFontSize>0</FixedFontSize>
+ </Persistence>
+</QXDMProfessional>

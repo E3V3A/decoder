@@ -55,7 +55,7 @@ namespace ProtocolDecoder
                 return;
             }
 
-            if(bw!=null)
+            if(bw != null)
             { 
                 bw.ReportProgress(1, "opening qxdm");
             }
@@ -65,7 +65,7 @@ namespace ProtocolDecoder
                 return;
             }
 
-            if(bw!=null)
+            if(bw != null)
             { 
                 bw.ReportProgress(1, "extracting isf log");
             }
@@ -81,7 +81,7 @@ namespace ProtocolDecoder
             mask.MsgList = new uint[] { 21, 6039 };
 
 
-            mask.DiagList = new uint[] { 124 };
+            mask.DiagList = new uint[] { 0, 124 };
             mask.SubSysList = new SubSysMask[] { new SubSysMask(8, 1), new SubSysMask(4, 15) };
             if (!QXDMProcessor.GetIsf(mask))
             {

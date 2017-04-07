@@ -79,6 +79,16 @@ namespace ProtocolDecoder
         private void ApplyFilter(LogMask mask)
         {
             iConfig.ClearConfig();
+
+            if (mask.DiagList != null && mask.DiagList.Length > 0)
+            {
+                iConfig.AddItem(1);//Diag response
+                for (int i = 0; i < mask.DiagList.Length; i++)
+                {
+                    iConfig.AddDIAGResponse(mask.DiagList[i]);
+                }
+            }
+
             if (mask.LogList != null && mask.LogList.Length > 0)
             {
                 iConfig.AddItem(5);//Log
@@ -100,14 +110,12 @@ namespace ProtocolDecoder
                     iConfig.AddMessage(mask.MsgList[i], 4);
                 }
             }
-            if(mask.DiagList!=null && mask.DiagList.Length>0)
+
+            if (mask.MsgList != null && mask.MsgList.Length > 0)
             {
-                iConfig.AddItem(1);//Diag response
-                for(int i =0;i<mask.DiagList.Length;i++)
-                {
-                    iConfig.AddDIAGResponse(mask.DiagList[i]);
-                }
+                iConfig.AddItem(7);//String                
             }
+
             if (mask.SubSysList != null && mask.SubSysList.Length > 0)
             {
                 iConfig.AddItem(9);//sub sys dispatch response

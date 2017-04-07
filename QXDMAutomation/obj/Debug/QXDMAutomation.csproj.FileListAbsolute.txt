@@ -1,0 +1,7 @@
+C:\liumeng\ProtocolDecoder\QXDMAutomation\bin\Debug\QXDMAutomation.exe.config
+C:\liumeng\ProtocolDecoder\QXDMAutomation\obj\Debug\QXDMAutomation.csproj.ResolveComReference.cache
+C:\liumeng\ProtocolDecoder\QXDMAutomation\bin\Debug\QXDMAutomation.exe
+C:\liumeng\ProtocolDecoder\QXDMAutomation\bin\Debug\QXDMAutomation.pdb
+C:\liumeng\ProtocolDecoder\QXDMAutomation\obj\Debug\QXDMAutomation.csprojResolveAssemblyReference.cache
+C:\liumeng\ProtocolDecoder\QXDMAutomation\obj\Debug\QXDMAutomation.exe
+C:\liumeng\ProtocolDecoder\QXDMAutomation\obj\Debug\QXDMAutomation.pdb

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="US-ASCII"?>
+<UserColorItems>
+	<!--
+  < UserColorItem cmdID="125" key1="0" key2="0" key3="0" red="0xFF" green="0x00" blue="0x00" isTx="true" /> 
+  < UserColorItem cmdID="125" key1="0" key2="0" key3="0" red="0xFF" green="0xFF" blue="0xFF" />
+  < UserColorItem cmdID="75" key1="0" key2="50" key3="6" red="0xFF" green="0x00" blue="0x00" isTx="true" /> subsys TX example
+  < UserColorItem cmdID="75" key1="0" key2="50" key3="6" red="0xFF" green="0xFF" blue="0xFF" /> subsys RX example
+  -->
+</UserColorItems>

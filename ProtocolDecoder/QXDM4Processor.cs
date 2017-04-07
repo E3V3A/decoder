@@ -84,6 +84,25 @@ namespace ProtocolDecoder
 
         private void ApplyFilter(LogMask mask)
         {
+            if (mask.DiagList != null && mask.DiagList.Length > 0)
+            {
+                iConfig.AddItem(1);//Diag response
+                for (int i = 0; i < mask.DiagList.Length; i++)
+                {
+                    iConfig.AddDIAGResponse(mask.DiagList[i]);
+                }
+            }
+
+            if (mask.LogList != null && mask.LogList.Length > 0)
+            {
+                iConfig.AddItem(5);//Log
+                for (int i = 0; i < mask.LogList.Length; i++)
+                {
+                    Debug.WriteLine("0x{0:X}", mask.LogList[i]);
+                    iConfig.AddLog(mask.LogList[i]);
+                }
+            }
+            
             if (mask.MsgList != null && mask.MsgList.Length > 0)
             {
                 iConfig.AddItem(6);//Message                
@@ -97,13 +116,18 @@ namespace ProtocolDecoder
                     iConfig.AddMessage(mask.MsgList[i], 4);
                 }
             }
-            if (mask.LogList != null && mask.LogList.Length > 0)
+
+            if (mask.MsgList != null && mask.MsgList.Length > 0)
             {
-                iConfig.AddItem(5);//Log
-                for (int i = 0; i < mask.LogList.Length; i++)
+                iConfig.AddItem(7);//String                
+            }
+
+            if (mask.SubSysList != null && mask.SubSysList.Length > 0)
+            {
+                iConfig.AddItem(9);//sub sys dispatch response
+                for (int i = 0; i < mask.SubSysList.Length; i++)
                 {
-                    Debug.WriteLine("0x{0:X}", mask.LogList[i]);
-                    iConfig.AddLog(mask.LogList[i]);
+                    iConfig.AddSubsysResponse(mask.SubSysList[i].SubSysID, mask.SubSysList[i].SubSysCmd);
                 }
             }
 

@@ -24,9 +24,7 @@ namespace ProtocolDecoder
             }
             else if (Args.Length == 1)
             {
-
                 IsfDecoder.DecodeIsf(Args[0], null, false);
-
             }
             else if (Args.Length == 2)
             {

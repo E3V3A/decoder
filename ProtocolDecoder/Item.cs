@@ -22,6 +22,7 @@ namespace ProtocolDecoder
         private string IMEI = null;
         private string IMSI = null;
         private string BuildID = null;
+        private string VersionRsp = null;
         //private string Slot = "0";
 
         public Item()
@@ -574,6 +575,18 @@ namespace ProtocolDecoder
             WriteDebugFile(String.Format("{0,-20} {1,5} {2} {3}", match.Groups[1].Value, match.Groups[2].Value, match.Groups[3].Value, match.Groups[4].Value));
         }
 
+        private void HandleString()
+        {
+            if (Content.Count == 0)
+            {
+                return;
+            }
+            if(Content[0].StartsWith("\t"))
+            {
+                WriteApduFile(Content[0].Substring(1));
+            }
+        }
+
         private void HandleDiagRsp()
         {
             int index = 0;
@@ -632,7 +645,21 @@ namespace ProtocolDecoder
                     IMSI = imsi;
                 }
             }
+            else if (Name.Contains("General Version Response"))
+            {
+                //VersionRsp
+                string version = null;
 
+                if (Content.Count >= 3 && Content[1].Contains("Comp Date") && Content[2].Contains("Comp Time"))
+                { 
+                    version = Content[1] + ", " + Content[2];
+                    if(!version.Equals(VersionRsp))
+                    {
+                        WriteApduFile(version);
+                        VersionRsp = version;
+                    }
+                }
+            }
         }
 
         public uint GetApduCount()
@@ -665,6 +692,9 @@ namespace ProtocolDecoder
                         break;
                     case 0x1feb:
                         HandleDebugMsg();
+                        break;
+                    case 0x1ffc:
+                        HandleString();
                         break;
                     case 0x1544:
                         HandleQMI();

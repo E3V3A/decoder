@@ -93,10 +93,8 @@ namespace ProtocolDecoder
 
         private void buttonAbout_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("Feel free to share!"
-                           + "\nAuthor: Liu Meng（刘猛）"
-                           + "\nE-Mail: veryliumeng@qq.com"
-                           + "\nWebsite: http://blog.csdn.net/veryliumeng"
+            MessageBox.Show("\nBy Liu Meng（刘猛）"
+                           + "\nhttp://blog.csdn.net/veryliumeng"
                            , "About", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
